@@ -1,12 +1,21 @@
-## Welcome to GitHub Pages
+### Crazyflie Indoor Position Logger Controller
+is a tool developed for two main reasons:
+- to get estimated position from the crazyflie
+- to control the quadcopter so that it follow a generated path
 
-You can use the [editor on GitHub](https://github.com/capriele/Crazyflie-Indoor-Position-Logger-Controller/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+The software is composed by three different part:
+- a simple GUI for the user
+- a logger
+- a controller (in this case an LQR controller)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Installation
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Simply clone/download the repo and execute on a terminal:
+{% highlight %}
+git clone https://github.com/capriele/Crazyflie-Indoor-Position-Logger-Controller.git
+cd Crazyflie-Indoor-Position-Logger-Controller
+python app.py
+{% endhighlight %}
 
 ```markdown
 Syntax highlighted code block
@@ -28,10 +37,6 @@ Syntax highlighted code block
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/capriele/Crazyflie-Indoor-Position-Logger-Controller/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
 ### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+If you have same trouble with this app please contact me at: [Email](petrucci.alberto@gmail.com).
