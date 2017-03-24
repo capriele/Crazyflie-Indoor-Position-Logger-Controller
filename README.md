@@ -72,9 +72,9 @@ The main file that implements our virtual quadcopter is `drone_quaternion.py`. I
 The state of the drone is the following: [q0, q1, q2, q3, wx, wy, wz, px, py, pz, vx, vy, vz]'.
 Where:
 - [q0, q1, q2, q3] are the quaternions
-- [wx, wy, wz] the angular velocities
-- [px, py, pz] the linear position
-- [vx, vy, vz] the linear velocity
+- [wx, wy, wz] are the angular velocities
+- [px, py, pz] are the linear position
+- [vx, vy, vz] are the linear velocity
 In terms of mathematical equation:
 ```markdown
 Q=[
@@ -129,27 +129,7 @@ Probably you need to install some library to run the project. This is the main l
 - htmlPy + PyQt
 - scipy + control + slycot python packages
 
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
 ### Support or Contact
 
-If you have same trouble with this app please contact me at: [Email](petrucci.alberto@gmail.com).
+If you have same trouble with this app please contact me at: [petrucci.alberto@gmail.com](petrucci.alberto@gmail.com).
 
