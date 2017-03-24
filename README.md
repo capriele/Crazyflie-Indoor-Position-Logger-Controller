@@ -57,8 +57,9 @@ this list can be simply generated throught the first page of the GUI.
 ### Logger + Controller
 This is a the main interface of the logger and the controller:
 ![Image](images/image4.png)
+
 In particular:
-- the red sphere are the nodes
+- the red sphere are the uwb-nodes
 - the green sphere is the current setpoint
 - the cube is the crazyflie
 
@@ -74,6 +75,46 @@ Where:
 - [wx, wy, wz] the angular velocities
 - [px, py, pz] the linear position
 - [vx, vy, vz] the linear velocity
+In terms of mathematical equation:
+```markdown
+Q=[
+-q(2) -q(3) -q(4);
+ q(1) -q(4)  q(3);
+ q(4)  q(1) -q(2);
+-q(3)  q(2)  q(1)
+];
+
+R = [
+ q(1)*q(1) + q(2) * q(2) - q(3) * q(3) - q(4) * q(4), 2 * q(2) * q(3) - 2 * q(1) * q(4), 2 * q(2) * q(4) + 2 * q(1) * q(3);
+ 2 * q(2) * q(3) + 2 * q(1) * q(4), q(1) * q(1) - q(2) * q(2) + q(3) * q(3) - q(4) * q(4), 2 * q(3) * q(4) - 2 * q(1) * q(2);
+ 2 * q(2) * q(4) - 2 * q(1) * q(3), 2 * q(3) * q(4) + 2 * q(1) * q(2), q(1) * q(1) - q(2) * q(2) - q(3) * q(3) + q(4) * q(4);
+];
+
+M = [
+ 0 -omega(3) omega(2); 
+ omega(3) 0 -omega(1); 
+ -omega(2) omega(1) 0
+ ];
+
+J = [
+ m*d^2 0 0;
+ 0 m*d^2 0;
+ 0 0 2*m*d^2
+];
+
+F_b = [0 0 F_tot]';
+
+q_dot = 0.5*Q*omega; 
+w_dot = drone.Mat_Jinv*(u(2:4)-M*J*omega);
+p_dot = v;
+v_dot = (1/m)*(R*F_b) - [0 0 g]';
+```
+Where the costants have the following values:
+```markdown
+g = 9.81;  %gravity acceleration in [m/s^2]
+m = 0.027; %drone mass in [Kg]
+d = (65.0538/1000)*sin(pi/4); %distance between motor's center and quadcopter's center in [m]
+```
 
 ### Installation
 
