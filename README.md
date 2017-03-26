@@ -81,7 +81,7 @@ Where:
 In terms of mathematical equation:
 
 	%Quaternion dynamics matrix
-	Q=[
+	Q = [
 	-q(2) -q(3) -q(4);
 	 q(1) -q(4)  q(3);
 	 q(4)  q(1) -q(2);
