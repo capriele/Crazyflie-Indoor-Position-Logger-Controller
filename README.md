@@ -147,7 +147,7 @@ r = (m4 + m3 - m2 - m1)   = 4*u[1, 0]
 p = (m1 + m4 - m2 - m3)   = 4*u[2, 0]
 ```
 after we can send this command to the crazyflie with the `cflib`
-```markdown
+```
 self._cf.commander.send_setpoint(r, p, 0, int(t))
 ```
 
