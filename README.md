@@ -77,6 +77,7 @@ Where:
 - [wx, wy, wz] are the angular velocities
 - [px, py, pz] are the linear position
 - [vx, vy, vz] are the linear velocity
+
 In terms of mathematical equation:
 	Q=[
 	-q(2) -q(3) -q(4);
