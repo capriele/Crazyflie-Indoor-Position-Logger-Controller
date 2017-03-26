@@ -10,7 +10,7 @@ The software is composed by three different part:
 - a logger
 - a controller (in this case an offline LQR controller)
 
-### The GUI
+## The GUI
 The user interface is mainly composed by three pages:
 - the first one used to generate the desired path
 ![Image](images/image1.png)
@@ -56,7 +56,7 @@ The second one (`sequence.json`), instead simply contains a list of point in 4D 
 ```
 this list can be simply generated throught the first page of the GUI.
 
-### Logger + Controller
+## Logger + Controller
 This is a the main interface of the logger and the controller:
 ![Image](images/image4.png)
 
@@ -153,7 +153,7 @@ after we can send this command to the crazyflie with the `cflib`
 ## NonLinear Observer
 The NonLinear Observer was developed according: [Link](http://ing.univaq.it/manes/FilesLavoriPDF/R002_Observer_NonlinAn-TMeA_97.pdf)
 
-### Installation
+## Installation
 
 Simply clone/download the repo and execute on a terminal:
 
@@ -167,7 +167,7 @@ Probably you need to install some library to run the project. This is the main l
 - PyGame
 - scipy + control + slycot python packages
 
-### Support or Contact
+## Support or Contact
 
 If you have same trouble with this app please contact me at: [petrucci.alberto@gmail.com](mailto:petrucci.alberto@gmail.com).
 
