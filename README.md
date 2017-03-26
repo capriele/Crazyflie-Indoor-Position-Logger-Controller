@@ -80,6 +80,7 @@ Where:
 
 In terms of mathematical equation:
 
+	%Quaternion dynamics matrix
 	Q=[
 	-q(2) -q(3) -q(4);
 	 q(1) -q(4)  q(3);
@@ -87,25 +88,31 @@ In terms of mathematical equation:
 	-q(3)  q(2)  q(1)
 	];
 
+	%Rotation matrix
 	R = [
 	 q(1)*q(1)+q(2)*q(2)-q(3)*q(3)-q(4)*q(4), 2*q(2)*q(3)-2*q(1)*q(4), 2*q(2)*q(4)+2*q(1)*q(3);
 	 2*q(2)*q(3)+2*q(1)*q(4), q(1)*q(1)-q(2)*q(2)+q(3)*q(3)-q(4)*q(4), 2*q(3)*q(4)-2*q(1)*q(2);
 	 2*q(2)*q(4)-2*q(1)*q(3), 2*q(3)*q(4) + 2*q(1)*q(2), q(1)*q(1)-q(2)*q(2)-q(3)*q(3)+q(4)*q(4);
 	];
 
+	%Skew matrix
 	M = [
 	 0 -omega(3) omega(2); 
 	 omega(3) 0 -omega(1); 
 	 -omega(2) omega(1) 0
 	 ];
 
+	%Inertia matrix
 	J = [
 	 m*d^2 0 0;
 	 0 m*d^2 0;
 	 0 0 2*m*d^2
 	];
 
+	%Total force on z-axis
 	F_b = [0 0 F_tot]';
+	
+	%State dynamics
 	q_dot = 0.5*Q*omega; 
 	w_dot = drone.Mat_Jinv*(u(2:4)-M*J*omega);
 	p_dot = v;
