@@ -170,5 +170,5 @@ Probably you need to install some library to run the project. This is the main l
 
 ### Support or Contact
 
-If you have same trouble with this app please contact me at: [petrucci.alberto@gmail.com](mailto:petrucci.alberto@gmail.com).
+If you have same trouble with this application please contact me at: [petrucci.alberto@gmail.com](mailto:petrucci.alberto@gmail.com).
 
