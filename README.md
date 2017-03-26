@@ -168,6 +168,7 @@ python app.py
 Probably you need to install some library to run the project. This is the main list of the software i have installed:
 - panda3D
 - htmlPy + PyQt
+- PyGame
 - scipy + control + slycot python packages
 
 ### Support or Contact
