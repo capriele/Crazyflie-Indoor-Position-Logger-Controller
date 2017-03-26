@@ -78,7 +78,6 @@ Where:
 - [px, py, pz] are the linear position
 - [vx, vy, vz] are the linear velocity
 In terms of mathematical equation:
-```
 	Q=[
 	-q(2) -q(3) -q(4);
 	 q(1) -q(4)  q(3);
@@ -109,28 +108,22 @@ In terms of mathematical equation:
 	w_dot = drone.Mat_Jinv*(u(2:4)-M*J*omega);
 	p_dot = v;
 	v_dot = (1/m)*(R*F_b) - [0 0 g]';
-```
 
 Where the costants have the following values:
-```
 	g = 9.81;  %gravity acceleration in [m/s^2]
 	m = 0.027; %drone mass in [Kg]
 	d = (65.0538/1000)*sin(pi/4); %distance between motor's center and quadcopter's center in [m]
-```
 
 ## Control
 After the linearization around a stability point we can calculate the LQR gain matrix (`K`). However inside the model the input vector is composed by 4 components:
-```
 	[
 	F1+F2+F3+F4; //total thrust
 	Mx;          //moment around x-axis
 	My;          //moment around y-axis
 	Mz;          //moment around z-axis
 	]
-```
 
 while the crazyflie accepts only the tuple (roll, pitch, yaw, thrust) for setpoints. So we need to convert these input in that way:
-```
 	scale = 65536.0 / (f_max * 4)
 	u[0, 0] = u[0, 0]*scaleFactor
 	u[1, 0] = (u[1, 0]/2.0)/self.d
@@ -141,19 +134,14 @@ while the crazyflie accepts only the tuple (roll, pitch, yaw, thrust) for setpoi
 	#m2 = u[0, 0] - u[1, 0] - u[2, 0] - u[3, 0]
 	#m3 = u[0, 0] + u[1, 0] - u[2, 0] + u[3, 0]
 	#m4 = u[0, 0] + u[1, 0] + u[2, 0] - u[3, 0]
-```
 
 so we can get the right (roll, pitch, thrust) in that way:
-```
 	t = (m1 + m2 + m3 + m4)/4 = u[0, 0]
 	r = (m4 + m3 - m2 - m1)   = 4*u[1, 0]
 	p = (m1 + m4 - m2 - m3)   = 4*u[2, 0]
-```
 
 after we can send this command to the crazyflie with the `cflib`
-```
 	self._cf.commander.send_setpoint(r, p, 0, int(t))
-```
 
 ## NonLinear Observer
 The NonLinear Observer was developed according: [Link](http://ing.univaq.it/manes/FilesLavoriPDF/R002_Observer_NonlinAn-TMeA_97.pdf)
@@ -161,11 +149,9 @@ The NonLinear Observer was developed according: [Link](http://ing.univaq.it/mane
 ### Installation
 
 Simply clone/download the repo and execute on a terminal:
-```
 	git clone https://github.com/capriele/Crazyflie-Indoor-Position-Logger-Controller.git
 	cd Crazyflie-Indoor-Position-Logger-Controller
 	python app.py
-```
 
 Probably you need to install some library to run the project. This is the main list of the software i have installed:
 - panda3D
