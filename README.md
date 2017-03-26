@@ -2,6 +2,7 @@
 is a tool developed for two main reasons:
 - to get estimated position from the crazyflie
 - to control the quadcopter so that it follow a generated path
+if you like this project leave a start. Thanks!
 
 The software is composed by three different part:
 - a simple GUI for the user
@@ -86,9 +87,9 @@ Q=[
 ```
 ```markdown
 R = [
- q(1)*q(1) + q(2) * q(2) - q(3) * q(3) - q(4) * q(4), 2 * q(2) * q(3) - 2 * q(1) * q(4), 2 * q(2) * q(4) + 2 * q(1) * q(3);
- 2 * q(2) * q(3) + 2 * q(1) * q(4), q(1) * q(1) - q(2) * q(2) + q(3) * q(3) - q(4) * q(4), 2 * q(3) * q(4) - 2 * q(1) * q(2);
- 2 * q(2) * q(4) - 2 * q(1) * q(3), 2 * q(3) * q(4) + 2 * q(1) * q(2), q(1) * q(1) - q(2) * q(2) - q(3) * q(3) + q(4) * q(4);
+ q(1)*q(1)+q(2)*q(2)-q(3)*q(3)-q(4)*q(4), 2*q(2)*q(3)-2*q(1)*q(4), 2*q(2)*q(4)+2*q(1)*q(3);
+ 2*q(2)*q(3)+2*q(1)*q(4), q(1)*q(1)-q(2)*q(2)+q(3)*q(3)-q(4)*q(4), 2*q(3)*q(4)-2*q(1)*q(2);
+ 2*q(2)*q(4)-2*q(1)*q(3), 2*q(3)*q(4) + 2*q(1)*q(2), q(1)*q(1)-q(2)*q(2)-q(3)*q(3)+q(4)*q(4);
 ];
 ```
 ```markdown
