@@ -22,7 +22,7 @@ The user interface is mainly composed by three pages:
 ![Image](images/image3.png)
 
 The configuration is done by two different json files `config.json` and `sequence.json`. The first one, `config.json`, has the following structure:
-```markdown
+```
 {
 	"crazyflies": [
 	  {
@@ -47,7 +47,7 @@ Where:
 - **show_realtime_plots:** is a boolean value (if 1 two plot related to the position and the attitude will be shown)
 
 The second one (`sequence.json`), instead simply contains a list of point in 4D ([x, y, z]-coords + time in seconds). So for example the list can be:
-```markdown
+```
 [
   [0.640, 1.11, 1.7, 1],
   [0.704, 1.11, 1.7, 1],
@@ -78,7 +78,7 @@ Where:
 - [px, py, pz] are the linear position
 - [vx, vy, vz] are the linear velocity
 In terms of mathematical equation:
-```markdown
+```
 Q=[
 -q(2) -q(3) -q(4);
  q(1) -q(4)  q(3);
@@ -86,21 +86,21 @@ Q=[
 -q(3)  q(2)  q(1)
 ];
 ```
-```markdown
+```
 R = [
  q(1)*q(1)+q(2)*q(2)-q(3)*q(3)-q(4)*q(4), 2*q(2)*q(3)-2*q(1)*q(4), 2*q(2)*q(4)+2*q(1)*q(3);
  2*q(2)*q(3)+2*q(1)*q(4), q(1)*q(1)-q(2)*q(2)+q(3)*q(3)-q(4)*q(4), 2*q(3)*q(4)-2*q(1)*q(2);
  2*q(2)*q(4)-2*q(1)*q(3), 2*q(3)*q(4) + 2*q(1)*q(2), q(1)*q(1)-q(2)*q(2)-q(3)*q(3)+q(4)*q(4);
 ];
 ```
-```markdown
+```
 M = [
  0 -omega(3) omega(2); 
  omega(3) 0 -omega(1); 
  -omega(2) omega(1) 0
  ];
 ```
-```markdown
+```
 J = [
  m*d^2 0 0;
  0 m*d^2 0;
@@ -114,7 +114,7 @@ p_dot = v;
 v_dot = (1/m)*(R*F_b) - [0 0 g]';
 ```
 Where the costants have the following values:
-```markdown
+```
 g = 9.81;  %gravity acceleration in [m/s^2]
 m = 0.027; %drone mass in [Kg]
 d = (65.0538/1000)*sin(pi/4); %distance between motor's center and quadcopter's center in [m]
@@ -122,7 +122,7 @@ d = (65.0538/1000)*sin(pi/4); %distance between motor's center and quadcopter's 
 
 ## Control
 After the linearization around a stability point we can calculate the LQR gain matrix (`K`). However inside the model the input vector is composed by 4 components:
-```markdown
+```
 [
 F1+F2+F3+F4; //total thrust
 Mx;          //moment around x-axis
@@ -131,7 +131,7 @@ Mz;          //moment around z-axis
 ]
 ```
 while the crazyflie accepts only the tuple (roll, pitch, yaw, thrust) for setpoints. So we need to convert these input in that way:
-```markdown
+```
 scale = 65536.0 / (f_max * 4)
 u[0, 0] = u[0, 0]*scaleFactor
 u[1, 0] = (u[1, 0]/2.0)/self.d
@@ -144,7 +144,7 @@ u[3, 0] = u[3, 0]/self.c
 #m4 = u[0, 0] + u[1, 0] + u[2, 0] - u[3, 0]
 ```
 so we can get the right (roll, pitch, thrust) in that way:
-```markdown
+```
 t = (m1 + m2 + m3 + m4)/4 = u[0, 0]
 r = (m4 + m3 - m2 - m1)   = 4*u[1, 0]
 p = (m1 + m4 - m2 - m3)   = 4*u[2, 0]
@@ -160,7 +160,7 @@ The NonLinear Observer was developed according: [Link](http://ing.univaq.it/mane
 ### Installation
 
 Simply clone/download the repo and execute on a terminal:
-```markdown
+```
 git clone https://github.com/capriele/Crazyflie-Indoor-Position-Logger-Controller.git
 cd Crazyflie-Indoor-Position-Logger-Controller
 python app.py
