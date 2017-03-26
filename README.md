@@ -110,6 +110,7 @@ w_dot = drone.Mat_Jinv*(u(2:4)-M*J*omega);
 p_dot = v;
 v_dot = (1/m)*(R*F_b) - [0 0 g]';
 ```
+
 Where the costants have the following values:
 ```
 g = 9.81;  %gravity acceleration in [m/s^2]
@@ -127,6 +128,7 @@ My;          //moment around y-axis
 Mz;          //moment around z-axis
 ]
 ```
+
 while the crazyflie accepts only the tuple (roll, pitch, yaw, thrust) for setpoints. So we need to convert these input in that way:
 ```
 scale = 65536.0 / (f_max * 4)
@@ -140,12 +142,14 @@ u[3, 0] = u[3, 0]/self.c
 #m3 = u[0, 0] + u[1, 0] - u[2, 0] + u[3, 0]
 #m4 = u[0, 0] + u[1, 0] + u[2, 0] - u[3, 0]
 ```
+
 so we can get the right (roll, pitch, thrust) in that way:
 ```
 t = (m1 + m2 + m3 + m4)/4 = u[0, 0]
 r = (m4 + m3 - m2 - m1)   = 4*u[1, 0]
 p = (m1 + m4 - m2 - m3)   = 4*u[2, 0]
 ```
+
 after we can send this command to the crazyflie with the `cflib`
 ```
 self._cf.commander.send_setpoint(r, p, 0, int(t))
@@ -162,6 +166,7 @@ git clone https://github.com/capriele/Crazyflie-Indoor-Position-Logger-Controlle
 cd Crazyflie-Indoor-Position-Logger-Controller
 python app.py
 ```
+
 Probably you need to install some library to run the project. This is the main list of the software i have installed:
 - panda3D
 - htmlPy + PyQt
