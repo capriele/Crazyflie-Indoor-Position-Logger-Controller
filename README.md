@@ -163,7 +163,7 @@ The NonLinear Observer was developed according: [Link](http://ing.univaq.it/mane
 ## Important Variables
 If there are same problems with the control you can change control's gain in the file `drone_quaternion.py`. 
 
-#### LQR GAINS
+#### LQR Gains
 These are the main gains for the LQR-controller that you can change going to the top of the `__init__(...)` function inside `drone_quaternion.py`
 
 	self.beta1 = 0.3  //gain for quaternions dynamics
@@ -174,7 +174,7 @@ These are the main gains for the LQR-controller that you can change going to the
         self.beta4 = 0.2  //gain for linear speeds
         self.beta = 500   //gain for the inputs
 	
-#### Backsteppings
+#### BackStepping Gains
 These are the main gains for the BackStepping-controller that you can change going to the function `backstepping(...)` inside `drone_quaternion.py`
 
 	# Controllers Parameters
