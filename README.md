@@ -8,7 +8,7 @@ if you like this project leave a start. Thanks!
 The software is composed by three different part:
 - a simple GUI for the user
 - a logger
-- a controller (in this case an offline LQR controller)
+- a controller (in this case an offline LQR controller or an offline BackStepping controller)
 
 ## The GUI
 The user interface is mainly composed by three pages:
