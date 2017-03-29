@@ -161,18 +161,20 @@ after we can send this command to the crazyflie with the `cflib`
 The NonLinear Observer was developed according: [Link](http://ing.univaq.it/manes/FilesLavoriPDF/R002_Observer_NonlinAn-TMeA_97.pdf)
 
 ## Important Variables
-If there are same problems with the control you can change control's gain in the file `drone_quaternion.py`. 
+If there are some problems with the control you can change control's gain in the file `drone_quaternion.py`. 
+	
+        self.thrustGain = 1.34 #gain for the conversion of force in thrust
 
 #### LQR Gains
 These are the main gains for the LQR-controller that you can change going to the top of the `__init__(...)` function inside `drone_quaternion.py`
 
-	self.beta1 = 0.3  //gain for quaternions dynamics
-        self.beta2 = 0.3  //gain for angular speeds
-        self.beta3x = 5.0 //gain for position coord-x
-        self.beta3y = 5.0 //gain for position coord-y
-        self.beta3z = 1.0 //gain for position coord-z
-        self.beta4 = 0.2  //gain for linear speeds
-        self.beta = 500   //gain for the inputs
+	self.beta1 = 0.3  #gain for quaternions dynamics
+        self.beta2 = 0.3  #gain for angular speeds
+        self.beta3x = 5.0 #gain for position coord-x
+        self.beta3y = 5.0 #gain for position coord-y
+        self.beta3z = 1.0 #gain for position coord-z
+        self.beta4 = 0.2  #gain for linear speeds
+        self.beta = 500   #gain for the inputs
 	
 #### BackStepping Gains
 These are the main gains for the BackStepping-controller that you can change going to the function `backstepping(...)` inside `drone_quaternion.py`
