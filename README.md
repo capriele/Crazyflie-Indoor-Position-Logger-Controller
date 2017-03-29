@@ -3,7 +3,7 @@ is a tool developed for two main reasons:
 - to get estimated position from the crazyflie
 - to control the quadcopter so that it follow a generated path
 
-if you like this project leave a start. Thanks!
+if you like this project leave a star (:star:). Thanks!
 
 The software is composed by three different part:
 - a simple GUI for the user
@@ -210,4 +210,4 @@ Probably you need to install some library to run the project. This is the main l
 ## Support or Contact
 
 If you have same trouble with this app please contact me at: [petrucci.alberto@gmail.com](mailto:petrucci.alberto@gmail.com).
-
+Please leave the signature into the navbar.
