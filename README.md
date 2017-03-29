@@ -160,6 +160,34 @@ after we can send this command to the crazyflie with the `cflib`
 ## NonLinear Observer
 The NonLinear Observer was developed according: [Link](http://ing.univaq.it/manes/FilesLavoriPDF/R002_Observer_NonlinAn-TMeA_97.pdf)
 
+## Important Variables
+If there are same problems with the control you can change control's gain in the file `drone_quaternion.py`. 
+#LQR GAINS
+These are the main gains for the LQR-controller that you can change going to the top of the `__init__(...)` function inside `drone_quaternion.py`
+	self.beta1 = 0.3  //gain for quaternions dynamics
+        self.beta2 = 0.3  //gain for angular speeds
+        self.beta3x = 5.0 //gain for position coord-x
+        self.beta3y = 5.0 //gain for position coord-y
+        self.beta3z = 1.0 //gain for position coord-z
+        self.beta4 = 0.2  //gain for linear speeds
+        self.beta = 500   //gain for the inputs
+	
+#Backsteppings
+These are the main gains for the BackStepping-controller that you can change going to the function `backstepping(...)` inside `drone_quaternion.py`
+	# Controllers Parameters
+        c1 = 6.11 #gain for roll
+        c3 = 6.11 #gain for pitch
+        c5 = 6.11 #gain for yaw
+        c7 = 6.11 #gain for z
+        c2 = 7.96 #gain for roll
+        c4 = 7.96 #gain for pitch
+        c6 = 7.96 #gain for yaw
+        c8 = 7.96 #gain for z
+
+        # Levante Derivator Gains
+        L1 = -10
+        L2 = -60
+
 ## Installation
 
 Simply clone/download the repo and execute on a terminal:
