@@ -203,19 +203,20 @@ Simply clone/download the repo and execute on a terminal:
 
 Probably you need to install some library to run the project. This is the main list of the software i have installed:
 - panda3D
-- htmlPy + PyQt + PySide
+- htmlPy + PyQt + PySide + Jinja2
 - PyGame
 - scipy + control + slycot python packages
 
 You can install the previous packages with these commands:
 	
 	[sudo] pip install htmlPy
-	[sudo] pip install PySide
-	[sudo] pip install PyQt
+	[sudo] pip install PySide or [sudo] apt-get install python-pyside
+	[sudo] pip install PyQt or [sudo] apt install python-qt4
 	[sudo] pip install PyGame
 	[sudo] pip install scipy
 	[sudo] pip install control
 	[sudo] pip install slycot
+	[sudo] pip install jinja2
 
 ## Support or Contact
 
