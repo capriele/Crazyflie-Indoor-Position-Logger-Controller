@@ -37,7 +37,8 @@ The configuration is done by two different json files `config.json` and `sequenc
 		[1.18, 3.01, 0.77]
 	],
 	"autoconnect": 1,
-	"show_realtime_plots": 0
+	"show_realtime_plots": 0,
+	"land_altitude_step": 0.1,
 }
 ```
 Where:
@@ -45,6 +46,7 @@ Where:
 - **nodes:** contains all the position of the nodes into the room
 - **autoconnect:** is a boolean value (if 1 the app will connect to the crazyflie automatically)
 - **show_realtime_plots:** is a boolean value (if 1 two plot related to the position and the attitude will be shown)
+- **land_altitude_step:** altitude step during landing operation in meters (default: 0.1[m] = 10[cm])
 
 The second one (`sequence.json`), instead simply contains a list of point in 4D ([x, y, z]-coords + time in seconds). So for example the list can be:
 ```
