@@ -220,6 +220,7 @@ You can install the previous packages with these commands:
 	[sudo] pip install slycot
 	[sudo] pip install jinja2
 
+If you have some trouble during the slycot installation install it from source following this [link](https://github.com/python-control/Slycot)
 ## Support or Contact
 
 If you have same trouble with this app please contact me at: [petrucci.alberto@gmail.com](mailto:petrucci.alberto@gmail.com).
