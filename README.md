@@ -202,7 +202,7 @@ Simply clone/download the repo and execute on a terminal:
 	python app.py
 
 Probably you need to install some library to run the project. This is the main list of the software i have installed:
-- panda3D
+- panda3D [1.9.3], [Download](http://www.panda3d.org/download.php?sdk&version=1.9.3)
 - htmlPy + PyQt + PySide + Jinja2
 - PyGame
 - scipy + control + slycot python packages
