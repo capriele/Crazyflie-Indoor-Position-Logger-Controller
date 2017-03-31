@@ -1,0 +1,83 @@
+<!--
+  __author__ = "Alberto Petrucci"
+  __copyright__ = "Copyright 2017, Alberto Petrucci"
+  __credits__ = ["Alberto Petrucci"]
+  __license__ = "MIT"
+  __version__ = "1.0.0"
+  __maintainer__ = "Alberto Petrucci"
+  __email__ = "petrucci.alberto@.com"
+  __status__ = "Production"
+-->
+<nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse" style="padding: 1px;">
+    <button class="navbar-toggler navbar-toggler-right hidden-lg-up" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="BackEnd.home_page" data-bind="true">CrazySquare</a>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item {% if active_menu == "1" %}active{% endif %}">
+            <a class="nav-link" href="BackEnd.home_page">Sequence Generator</a>
+          </li>
+          <li class="nav-item {% if active_menu == "2" %}active{% endif %}">
+            <a class="nav-link" href="BackEnd.joystick_page">Joystick</a>
+          </li>
+          <li class="nav-item {% if active_menu == "3" %}active{% endif %}">
+            <a class="nav-link" href="BackEnd.sequence_page">Editor</a>
+          </li>
+          <li class="nav-item {% if active_menu == "4" %}active{% endif %}">
+            <a class="nav-link" href="BackEnd.start_sequence">Start Sequence</a>
+          </li>
+        </ul>
+    </div>
+    <small style="position:absolute;top:33px;left:10px;color:#fff">Created by Alberto Petrucci</small>
+</nav>
+
+<script type="text/javascript">
+var interval = false;
+$(document).ready(function(){
+  $('a.nav-link').on('click', function(){
+    if($(this).parent('li').hasClass('active'))
+      return false;
+    var url = $(this).attr('href');
+    var content;
+    if(url == 'BackEnd.sequence_page'){
+      $('li.nav-item').removeClass('active');
+      $(this).parent('li').addClass('active');
+      content = BackEnd.sequence_page();
+    }
+    else if(url == 'BackEnd.joystick_page'){
+      $('li.nav-item').removeClass('active');
+      $(this).parent('li').addClass('active');
+      content = BackEnd.joystick_page();
+    }
+    else if(url == 'BackEnd.home_page'){
+      $('li.nav-item').removeClass('active');
+      $(this).parent('li').addClass('active');
+      content = BackEnd.home_page();
+    }
+    else if(url == 'BackEnd.start_sequence'){
+      BackEnd.start_sequence();
+      content = false;
+    }
+    if(content){
+      if (interval)
+        clearInterval(interval);
+      $('#main-container').replaceWith(content);
+      if($(document).find('.json-editor').length > 0){
+        var height = $(window).height() - 220;
+        $(document).find('.json-editor').css('height', height+'px');
+      }
+    }
+  });
+});
+</script>
+
+<style type="text/css">
+body {
+  overflow: hidden;
+}
+#main-container .json-editor{
+  overflow-y: auto; 
+}
+</style>

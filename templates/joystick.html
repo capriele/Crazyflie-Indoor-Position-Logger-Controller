@@ -1,0 +1,129 @@
+<!--
+  __author__ = "Alberto Petrucci"
+  __copyright__ = "Copyright 2017, Alberto Petrucci"
+  __credits__ = ["Alberto Petrucci"]
+  __license__ = "MIT"
+  __version__ = "1.0.0"
+  __maintainer__ = "Alberto Petrucci"
+  __email__ = "petrucci.alberto@.com"
+  __status__ = "Production"
+-->
+    <div class="container-fluid" id="main-container">
+          <h3>PS3 Joystick</h3>
+          <table class="table">
+            <tr>
+              <td>
+                <div class="container pull-left">
+                  <div id="up" class="button"    style="top:0%; left:50%"></div>
+                  <div id="right" class="button" style="top:50%; left:100%"></div>
+                  <div id="down" class="button"  style="top:100%; left:50%"></div>
+                  <div id="left" class="button"  style="top:50%; left:0%"></div>
+                </div>
+              </td>
+              <td class="text-center" style="text-align:center;">
+                <div class="container">
+                  <div id="select" class="button" style="top:25%; left:0%"></div>
+                  <div id="ps" class="button"     style="top:45%; left:50%"></div>
+                  <div id="start" class="button"  style="top:25%; left:100%"></div>
+                </div>
+              </td>
+              <td>
+                <div class="container pull-right">
+                  <div id="triangle" class="button" style="top:0%; left:50%"></div>
+                  <div id="circle" class="button" style="top:50%; left:100%"></div>
+                  <div id="cross" class="button" style="top:100%; left:50%"></div>
+                  <div id="square" class="button" style="top:50%; left:0%"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="analog pull-left" style="left:40%;">
+                  <div id="left-analog" class="square"></div>
+                  <div class="horizontal-line"></div>
+                  <div class="vertical-line"></div>
+                </div>
+              </td>
+              <td></td>
+              <td>
+                <div class="analog pull-right" style="right:40%;">
+                  <div id="right-analog" class="square"></div>
+                  <div class="horizontal-line"></div>
+                  <div class="vertical-line"></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+          <br clear="all" />
+      <style type="text/css">
+      .pull-left{
+        float: left;
+      }
+      .pull-right{
+        float: right;
+      }
+      .button {
+        width: 40px;
+        height: 40px;
+        background: #ccc;
+        border: 1px solid rgba(0,0,0,.7);
+      }
+      .analog{
+        position: relative;
+        border: 2px solid #ccc;
+        width: 200px;
+        height: 200px;
+        padding: 0;
+        margin-top: 0px;
+        margin-bottom: 0px;
+      }
+      .container{
+        position: relative;
+        width: 200px;
+        height: 200px;
+        padding: 20px;
+        margin: 45px;
+      }
+      .container > *{
+        position: absolute;
+      }
+      .horizontal-line{
+        position: absolute;
+        top: 97px;
+        border: 2px dashed #ccc;
+        width: 198px;
+        height: 0px;
+        padding: 0;
+        z-index: 1;
+      }
+      .vertical-line{
+        position: absolute;
+        left: 97px;
+        border: 2px dashed #ccc;
+        height: 198px;
+        width: 0px;
+        padding: 0;
+        z-index: 1;
+      }
+      .square{
+        position: absolute;
+        top: 84px;
+        left: 84px;
+        border-radius: 50%;
+        background: rgba(0,0,0,.7);
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        z-index: 2;
+      }
+      </style>
+
+      <!-- Bootstrap core JavaScript
+      ================================================== -->
+      <!-- Placed at the end of the document so the pages load faster -->
+      <script type="text/javascript">
+      $(document).ready(function(){
+        interval = setInterval(Joystick.read, 1000/30);
+      });
+      </script>
+    </div>

@@ -1,0 +1,143 @@
+<!--
+  __author__ = "Alberto Petrucci"
+  __copyright__ = "Copyright 2017, Alberto Petrucci"
+  __credits__ = ["Alberto Petrucci"]
+  __license__ = "MIT"
+  __version__ = "1.0.0"
+  __maintainer__ = "Alberto Petrucci"
+  __email__ = "petrucci.alberto@.com"
+  __status__ = "Production"
+-->
+    <div class="container-fluid" id="main-container">
+      <div class="row">
+        <nav class="col-sm-6 col-md-6 hidden-xs-down bg-faded sidebar" style="padding:10px; overflow:hidden;">
+          <h3>Configuration Editor</h3>
+          <button type="button" class="btn btn-danger" onclick="javascript:saveConfigJson()" style="margin-bottom:10px;">Save JSON</button>
+          <div id="configuration_editor" class="json-editor table-responsive"></div>
+          
+        </nav>
+
+        <main class="col-sm-6 offset-sm-6 col-md-6 offset-md-6 pt-3">
+          <h3>Sequence Editor</h3>
+          <button type="button" class="btn btn-danger" onclick="javascript:saveSequenceJson()" style="margin-bottom:10px;">Save JSON</button>
+          <div id="sequence_editor" class="json-editor table-responsive"></div>
+        </main>
+      </div>
+
+      <!-- Bootstrap core JavaScript
+      ================================================== -->
+      <!-- Placed at the end of the document so the pages load faster -->
+      <script type="text/javascript">
+      var configJson = null;
+      var sequenceJson = configJson;
+
+      function openConfigJson() {
+        configJson = BackEnd.openJson('config');
+        configJson = JSON.parse(configJson);
+        $('#configuration_editor').jsonEditor(configJson, {
+          change: function(data) {
+            configJson = data;
+          }
+        });
+      }
+      function saveConfigJson() {
+        $.when( BackEnd.saveJson(JSON.stringify(configJson), 'config') ).done(function( x ) {
+          alert('JSON saved!');
+        });
+      }
+      function saveSequenceJson() {
+        $.when( BackEnd.saveJson(JSON.stringify(sequenceJson), 'sequence') ).done(function( x ) {
+          alert('JSON saved!');
+        });
+      }
+      function openSequenceJson() {
+        sequenceJson = BackEnd.openJson('sequence');
+        sequenceJson = JSON.parse(sequenceJson);
+        $('#sequence_editor').jsonEditor(sequenceJson, {
+          change: function(data) {
+            sequenceJson = data;
+          }
+        });
+      }
+
+      $(document).ready(function(){
+        openConfigJson();
+        openSequenceJson();
+      });
+      </script>
+      <style>
+          #json {
+            margin: 10px 10px 10px 32px;
+            width: 50%;
+            min-height: 70px;
+          }
+          #legend {
+            display: inline;
+            margin-left: 30px;
+          }
+          #legend h2 {
+             display: inline;
+             font-size: 18px;
+             margin-right: 20px;
+          }
+          #legend a {
+            color: white;
+            margin-right: 20px;
+          }
+          #legend span {
+            padding: 2px 4px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px black;
+            background-color: black;
+          }
+          #legend .string  { background-color: #009408; }
+          #legend .array   { background-color: #2D5B89; }
+          #legend .object  { background-color: #E17000; }
+          #legend .number  { background-color: #497B8D; }
+          #legend .boolean { background-color: #B1C639; }
+          #legend .null    { background-color: #B1C639; }
+          #expander {
+            cursor: pointer;
+            margin-right: 20px;
+          }
+          #footer {
+            font-size: 13px;
+          }
+          #rest {
+            margin: 20px 0 20px 30px;
+          }
+          #rest label {
+            font-weight: bold;
+          }
+          #rest-callback {
+            width: 70px;
+          }
+          #rest-url {
+            width: 700px;
+          }
+          label[for="json"] {
+            margin-left: 30px;
+            display: block;
+          }
+          #json-note {
+            margin-left: 30px;
+            font-size: 12px;
+          }
+          .addthis_toolbox {
+            position: relative;
+            top: -10px;
+            margin-left: 30px;
+          }
+          #disqus_thread {
+            margin-top: 50px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            border-top: 1px solid gray;
+            border-bottom: 1px solid gray;
+          }
+      </style>
+    </div>

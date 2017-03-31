@@ -1,0 +1,235 @@
+<!--
+  __author__ = "Alberto Petrucci"
+  __copyright__ = "Copyright 2017, Alberto Petrucci"
+  __credits__ = ["Alberto Petrucci"]
+  __license__ = "MIT"
+  __version__ = "1.0.0"
+  __maintainer__ = "Alberto Petrucci"
+  __email__ = "petrucci.alberto@.com"
+  __status__ = "Production"
+-->
+{% include 'header.html' %}
+    <div class="container-fluid" id="main-container">
+      <div class="row">
+        <nav class="text-center col-sm-5 col-md-2 hidden-xs-down bg-faded sidebar" style="padding:10px;">
+          <form>
+            <div class="form-group">
+              <label for="partial_sequence">Partial Sequence </label>
+              <input type="checkbox" value="0" id="partial_sequence">
+            </div>
+            <div class="form-group">
+              <label for="dt">Delta T:</label>
+              <input type="text" class="form-control" id="dt" placeholder="Delta T" value="1">
+            </div>
+            <div class="form-group">
+              <label for="samples"># Samples</label>
+              <input type="text" class="form-control" id="samples" placeholder="# Samples" value="100">
+            </div>
+            <div class="form-group">
+              <label for="x-function">X function:</label>
+              <input type="text" class="form-control" id="x-function" placeholder="(ex.: cos(x/2))" value="cos(x/2)">
+            </div>
+            <div class="form-group">
+              <label for="y-function">Y function:</label>
+              <input type="text" class="form-control" id="y-function" placeholder="(ex.: sin(y/2))" value="sin(y/2)">
+            </div>
+            <div class="form-group">
+              <label for="z-function">Z function:</label>
+              <input type="text" class="form-control" id="z-function" placeholder="(ex. sin(z))" value="sin(z)">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="javascript:generateGraph()">Generate</button>
+          </form>
+          <br />
+          <button type="button" class="btn btn-danger" onclick="javascript:saveJson()">Save JSON</button>
+          
+        </nav>
+
+        <main class="col-sm-7 offset-sm-3 col-md-10 offset-md-2 pt-3">
+          <h3>Sequence Generator</h3>
+          <small>
+            <b>
+              Use the arrows to rotate the plot.
+            </b>
+          </small>
+          <div id="container" class="table-responsive" style="min-height:550px"></div>
+        </main>
+      </div>
+
+      <!-- Bootstrap core JavaScript
+      ================================================== -->
+      <!-- Placed at the end of the document so the pages load faster -->
+      <script type="text/javascript">
+      var points = [];
+      var points4d = [];
+      var chart = null;
+      var partial_sequence = false;
+      var options = {
+            chart: {
+                renderTo: 'container',
+                margin: 100,
+                type: 'scatter',
+                options3d: {
+                    enabled: true,
+                    alpha: 30,
+                    beta: 30,
+                    depth: 450,
+                    viewDistance: 450,
+                    fitToPlot: true,
+                    frame: {
+                        bottom: { size: 1, color: 'rgba(0,0,0,0.02)' },
+                        back: { size: 1, color: 'rgba(0,0,0,0.04)' },
+                        side: { size: 1, color: 'rgba(0,0,0,0.06)' }
+                    }
+                }
+            },
+            plotOptions: {
+                scatter: {
+                    marker: {
+                      enabled: true,
+                      states:{
+                        hover: {
+                          enabled: false
+                        }
+                      }
+                    }
+                }
+            },
+
+            title: {
+                text: ''
+            },
+            yAxis: {
+                type: 'linear',
+                gridLineWidth: 1,
+                height: 450,            
+                width: 450,
+                //min: -10,
+                //max: 10,
+                title:''
+            },
+            xAxis: {
+                type: 'linear',
+                gridLineWidth: 1,
+                height: 450,            
+                width: 450,
+                //min: -10,
+                //max: 10,
+                title:''
+            },
+            zAxis: {
+                type: 'linear',
+                gridLineWidth: 0,
+                height: 450,            
+                //width: 1000,
+                //min: -10,
+                //max: 10,
+                title:''
+            },
+            legend: {
+                enabled: false
+            },
+            credits: {
+                enabled: false
+            },
+            series: [{
+                lineWidth: 1,
+                data: points,
+                enableMouseTracking: false
+            }]
+      };
+      function generateGraph(){
+          var funcx = $('#x-function').val();
+          var funcy = $('#y-function').val();
+          var funcz = $('#z-function').val();
+          var dt = parseFloat($('#dt').val());
+          var n = parseFloat($('#samples').val());
+          var x = 0;
+          var y = 0;
+          var z = 0;
+
+          //Svuoto il vettore dei punti
+          if(!partial_sequence){
+            points = [];
+            points4d = [];
+          }
+          for(var i = 0; i < n; ++i){
+            var x1 = MathParser.evaluate_function('x', funcx, x);
+            var y1 = MathParser.evaluate_function('y', funcy, y);
+            var z1 = MathParser.evaluate_function('z', funcz, z);
+
+            points.push([ x1, z1, y1 ]);
+            points4d.push([ x1, y1, z1, dt ]);
+
+            //Incremento di dt
+            x = x + dt;
+            y = y + dt;
+            z = z + dt;
+          }
+
+          options.series = [{
+            lineWidth: 0,
+            data: points,
+            enableMouseTracking: false
+          }];
+          chart = new Highcharts.Chart(options);  
+      }
+
+      function loadLastSequence(){
+        sequenceJson = BackEnd.openJson('sequence');
+        sequenceJson = JSON.parse(sequenceJson);
+        points4d = sequenceJson;
+        points = [];
+        for(var key in points4d){
+          var p = points4d[key];
+          points.push([p[0], p[2], p[1]]);
+        }
+        options.series = [{
+          lineWidth: 0,
+          data: points,
+          enableMouseTracking: false
+        }];
+        chart = new Highcharts.Chart(options);  
+      }
+
+      function saveJson(){
+        $.when( BackEnd.saveJson(JSON.stringify(points4d), 'sequence') ).done(function( x ) {
+          alert('JSON saved!');
+        });
+      }
+      
+      var sensitivity = 5;
+      $(document).on('keydown', function(e) {
+          var beta = chart.options.chart.options3d.beta;
+          var alpha = chart.options.chart.options3d.alpha;
+          if(e.keyCode == 37) { // left
+            chart.options.chart.options3d.beta = beta + sensitivity;
+            chart.redraw(false);
+          }
+          else if(e.keyCode == 39) { // right
+            chart.options.chart.options3d.beta = beta - sensitivity;
+            chart.redraw(false);
+          }
+          if(e.keyCode == 38) { // up
+            chart.options.chart.options3d.alpha = alpha - sensitivity;
+            chart.redraw(false);
+          }
+          else if(e.keyCode == 40) { // down
+            chart.options.chart.options3d.alpha = alpha + sensitivity;
+            chart.redraw(false);
+          }
+      });
+
+      //Checkbox event (partial sequence)
+      $("#partial_sequence").on('change', function() {
+          partial_sequence = this.checked;
+          points = [];
+          points4d = [];
+      });
+
+      $(document).ready(function() {
+        //generateGraph();
+        loadLastSequence();
+      });
+      </script>
+    </div>
+{% include 'footer.html' %}
