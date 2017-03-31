@@ -38,7 +38,7 @@ The configuration is done by two different json files `config.json` and `sequenc
 	],
 	"autoconnect": 1,
 	"show_realtime_plots": 0,
-	"land_altitude_step": 0.1,
+	"land_altitude_step": 0.1
 }
 ```
 Where:
