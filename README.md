@@ -221,4 +221,5 @@ You can install the previous packages with these commands:
 ## Support or Contact
 
 If you have same trouble with this app please contact me at: [petrucci.alberto@gmail.com](mailto:petrucci.alberto@gmail.com).
-Please leave the signature into the navbar.
+
+**Please leave the signature into the navbar.**
