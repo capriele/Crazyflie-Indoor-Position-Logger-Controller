@@ -260,14 +260,6 @@ class Quadcopter:
             [0], [0], [0], [0], [0], [0], [0]
         ])
 
-        # Variabili per BackStepping controller
-        self.x_levante = matrix([[0], [0], [0], [0]])
-        self.y_levante = matrix([[0], [0], [0], [0]])
-        self.z_levante = matrix([[0], [0], [0], [0]])
-        self.roll_levante = matrix([[0], [0], [0], [0]])
-        self.pitch_levante = matrix([[0], [0], [0], [0]])
-        self.yaw_levante = matrix([[0], [0], [0], [0]])
-
     def setSetPoint(self, q0, q1, q2, q3, omegax, omegay, omegaz, px, py, pz, vx, vy, vz):
         self.setPoint = matrix([
             [q0],
