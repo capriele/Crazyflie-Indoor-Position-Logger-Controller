@@ -5,10 +5,10 @@
 #__author__ = "Alberto Petrucci"
 #__copyright__ = "Copyright 2017, Alberto Petrucci"
 #__credits__ = ["Alberto Petrucci"]
-#__license__ = "MIT"
+#__license__ = "Apache"
 #__version__ = "1.0.0"
 #__maintainer__ = "Alberto Petrucci"
-#__email__ = "petrucci.alberto@.com"
+#__email__ = "petrucci.alberto@gmail.com"
 #__status__ = "Production"
 
 from ThreeAxisGrid import ThreeAxisGrid

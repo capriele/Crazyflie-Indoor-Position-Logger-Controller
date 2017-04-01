@@ -2,16 +2,17 @@
 Quadcopter Model + LQR Control + BackStepping Control
 """
 #
-# Author: Alberto Petrucci (petrucci.alberto@gmail.com) 2017
+#  Author: Alberto Petrucci (petrucci.alberto@gmail.com) 2017
 #
 #__author__ = "Alberto Petrucci"
 #__copyright__ = "Copyright 2017, Alberto Petrucci"
 #__credits__ = ["Alberto Petrucci"]
-#__license__ = "MIT"
+#__license__ = "Apache"
 #__version__ = "1.0.0"
 #__maintainer__ = "Alberto Petrucci"
-#__email__ = "petrucci.alberto@.com"
+#__email__ = "petrucci.alberto@gmail.com"
 #__status__ = "Production"
+
 from __future__ import division
 from numpy import *
 from math import *
@@ -24,6 +25,7 @@ class Quadcopter:
         self.g = 9.81
         self.airFriction = 0
         self.dt = dt
+        self.t = 0
 
         ## Parametri drone
         self.m = 27/1000       # massa del drone in g
@@ -45,7 +47,8 @@ class Quadcopter:
         self.beta3z = 1.0#1.0
         self.beta4 = 0.2
         self.beta = 500#3000
-        self.thrustGain = 1.34
+        self.thrustGain = 1
+        #self.thrustGain = 1.34
         #self.thrustGain = 1.37
         self.Tf = dt
         self.Mat_J = matrix([
@@ -258,12 +261,12 @@ class Quadcopter:
         ])
 
         # Variabili per BackStepping controller
-        self.x_levante = matrix([[0], [0], [0]])
-        self.y_levante = matrix([[0], [0], [0]])
-        self.z_levante = matrix([[0], [0], [0]])
-        self.roll_levante = matrix([[0], [0], [0]])
-        self.pitch_levante = matrix([[0], [0], [0]])
-        self.yaw_levante = matrix([[0], [0], [0]])
+        self.x_levante = matrix([[0], [0], [0], [0]])
+        self.y_levante = matrix([[0], [0], [0], [0]])
+        self.z_levante = matrix([[0], [0], [0], [0]])
+        self.roll_levante = matrix([[0], [0], [0], [0]])
+        self.pitch_levante = matrix([[0], [0], [0], [0]])
+        self.yaw_levante = matrix([[0], [0], [0], [0]])
 
     def setSetPoint(self, q0, q1, q2, q3, omegax, omegay, omegaz, px, py, pz, vx, vy, vz):
         self.setPoint = matrix([
@@ -344,143 +347,126 @@ class Quadcopter:
         self.u = self.Mat_T*f
         #self.predict(self.u)
 
-    def backstepping(self, yaw_desired, x_desired, y_desired, z_desired):
-
+    def backstepping(self, yaw_desired):
         roll, pitch, yaw = self.quaternion2RPY()
         # Euler Angles
-        x1 = yaw    # yaw
-        x2 = pitch  # pitch
-        x3 = roll   # roll
+        x5 = yaw  # yaw
+        x3 = pitch  # pitch
+        x1 = roll  # roll
 
         # Angular Speeds
-        x4 = self.omega[0, 0]  # wx
-        x5 = self.omega[1, 0]  # wy
+        x2 = self.omega[0, 0]  # wx
+        x4 = self.omega[1, 0]  # wy
         x6 = self.omega[2, 0]  # wz
 
         # Positions
-        x7 = self.p[0, 0]  # x
-        x8 = self.p[1, 0]  # y
-        x9 = self.p[2, 0]  # z
+        x9 = self.p[0, 0]   # x
+        x11 = self.p[1, 0]  # y
+        x7 = self.p[2, 0]   # z
 
         # Speeds
         x10 = self.v[0, 0]  # vx
-        x11 = self.v[1, 0]  # vy
-        x12 = self.v[2, 0]  # vz
+        x12 = self.v[1, 0]  # vy
+        x8 = self.v[2, 0]   # vz
 
         # Controllers Paramters
-        c1 = 6.11
-        c3 = 6.11
-        c5 = 6.11
-        c7 = 6.11
-        c2 = 7.96
-        c4 = 7.96
-        c6 = 7.96
-        c8 = 7.96
-
-        # Levante Derivator Gains
-        L1 = -10
-        L2 = -60
-
-        # Creo il riferimento di roll e pitch per controllare la x e la y
-        error = self.x_levante[0, 0] - x_desired
-        self.x_levante[0, 0] = self.x_levante[0, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.x_levante[1, 0]
-        self.x_levante[1, 0] = self.x_levante[1, 0] + L2 * self.dt * sign(error)
-
-        error = self.x_levante[2, 0] - self.x_levante[1, 0]
-        self.x_levante[2, 0] = self.x_levante[2, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.x_levante[3, 0]
-        self.x_levante[3, 0] = self.x_levante[3, 0] + L2 * self.dt * sign(error)
-
-        error = self.y_levante[0, 0] - y_desired
-        self.y_levante[0, 0] = self.y_levante[0, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.y_levante[1, 0]
-        self.y_levante[1, 0] = self.y_levante[1, 0] + L2 * self.dt * sign(error)
-
-        error = self.y_levante[2, 0] - self.y_levante[1, 0]
-        self.y_levante[2, 0] = self.y_levante[2, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.y_levante[3, 0]
-        self.y_levante[3, 0] = self.y_levante[3, 0] + L2 * self.dt * sign(error)
-
-
-        k11 = 155
-        k12 = 25
-        pd = -self.m * (self.x_levante[3, 0] + k11 * (self.x_levante[1, 0] - x10) + k12 * (self.x_levante[0, 0] - x7)) / self.u[0, 0] + self.pitch_levante[0, 0]
-        rd = -self.m * (self.y_levante[3, 0] + k11 * (self.y_levante[1, 0] - x11) + k12 * (self.y_levante[0, 0] - x8)) / self.u[0, 0] + self.roll_levante[0, 0]
-        pd = pd * self.dt
-        rd = rd * self.dt
-
-        # Condizioni di piccolo angolo: roll e pitch compresi tra +/-20deg
-        margin = 20 * math.pi / 180
-        if rd > margin:
-            rd = margin
-        if rd < -margin:
-            rd = -margin
-        if pd > margin:
-            pd = margin
-        if pd < -margin:
-            pd = -margin
-
-        # Altitude Controller
-        # Stimo Zd_dot_dot e Zd_dot(con levante)
-        error = self.z_levante[0, 0] - z_desired
-        self.z_levante[0, 0] = self.z_levante[0, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.z_levante[1, 0]
-        self.z_levante[1, 0] = self.z_levante[1, 0] + L2 * self.dt * sign(error)
-
-        error = self.z_levante[2, 0] - self.z_levante[1, 0]
-        self.z_levante[2, 0] = self.z_levante[2, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.z_levante[3, 0]
-        self.z_levante[3, 0] = self.z_levante[3, 0] + L2 * self.dt * sign(error)
-
-        Ez = z_desired - x9
-        U1 = self.m * (-Ez + self.g - self.z_levante[3, 0] - c7 * self.z_levante[1, 0] + c7 * x12 + c8 * (x12 - self.z_levante[1, 0] - c7 * Ez)) / (cos(x2) * cos(x3));
-
-        # Roll Controller
-        error = self.roll_levante[0, 0] - rd
-        self.roll_levante[0, 0] = self.roll_levante[0, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.roll_levante[1, 0]
-        self.roll_levante[1, 0] = self.roll_levante[1, 0] + L2 * self.dt * sign(error)
-
-        error = self.roll_levante[2, 0] - self.roll_levante[1, 0]
-        self.roll_levante[2, 0] = self.roll_levante[2, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.roll_levante[3, 0]
-        self.roll_levante[3, 0] = self.roll_levante[3, 0] + L2 * self.dt * sign(error)
-
-        z1 = rd - x3
-        z2 = x4 - self.roll_levante[1, 0] - c1 * z1
-        b1 = 1 / self.Ix; # d / self.Ix
         a1 = (self.Iy - self.Iz) / self.Ix
-        U2 = (-c2 * z2 + z1 - x5 * x6 * a1 + self.roll_levante[3, 0] + c1 * self.roll_levante[1, 0] - c1 * x4) / b1
+        a2 = (self.Iz - self.Ix) / self.Iy
+        a3 = (self.Ix - self.Iy) / self.Iz
+        b1 = self.d / self.Ix
+        b2 = self.d / self.Iy
+        b3 = 1 / self.Iz
 
-        # Pitch Controller
-        error = self.pitch_levante[0, 0] - pd
-        self.pitch_levante[0, 0] = self.pitch_levante[0, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.pitch_levante[1, 0]
-        self.pitch_levante[1, 0] = self.pitch_levante[1, 0] + L2 * self.dt * sign(error)
+        c1 = 15
+        c2 = 10
+        c3 = 15
+        c4 = 10
+        c5 = 10
+        c6 = 3
+        c7 = 100*0.2
+        c8 = 3*0.2
+        c9 = 5.1
+        c10 = 1.1
+        c11 = 5.1
+        c12 = 1.1
 
-        error = self.pitch_levante[2, 0] - self.pitch_levante[1, 0]
-        self.pitch_levante[2, 0] = self.pitch_levante[2, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.pitch_levante[3, 0]
-        self.pitch_levante[3, 0] = self.pitch_levante[3, 0] + L2 * self.dt * sign(error)
+        factor = 1
+        c1 *= factor
+        c2 *= factor
+        c3 *= factor
+        c4 *= factor
+        c5 *= factor
+        c6 *= factor
+        c7 *= factor
+        c8 *= factor
+        c9 *= factor
+        c10 *= factor
+        c11 *= factor
+        c12 *= factor
 
-        z3 = pd - x2
-        z4 = x5 - self.pitch_levante[1, 0] - c3 * z3
-        b2 = 1 / self.Iy; # d / Ix
-        a3 = (self.Iz - self.Ix) / self.Iy
-        U3 = (-c4 * z4 + z3 - x4 * x6 * a3 + self.pitch_levante[3, 0] + c3 * self.pitch_levante[1, 0] - c3 * x5) / b2
+        # contiene il riferimento + la sua derivata 1a e 2a
+        w = 1
+        a = 1
+        xd = matrix([
+            # Roll
+            [0, 0, 0],
+            # Pitch
+            [0, 0, 0],
+            # Yaw
+            [yaw_desired, 0, 0],
+            # X
+            [self.setPoint[7, 0], 0, 0],
+            #[self.setPoint[7, 0] + a * sin(w * self.t), w * a * cos(w * self.t), - w * w * a * sin(w * self.t)],
+            # Y
+            [self.setPoint[8, 0], 0, 0],
+            #[self.setPoint[8, 0] + a * cos(w * self.t), - w * a * sin(w * self.t), - w * w * a * cos(w * self.t)],
+            # Z
+            [self.setPoint[9, 0], 0, 0],
+        ])
 
-        # Yaw Controller
-        error = self.yaw_levante[0, 0] - yaw_desired
-        self.yaw_levante[0, 0] = self.yaw_levante[0, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.yaw_levante[1, 0]
-        self.yaw_levante[1, 0] = self.yaw_levante[1, 0] + L2 * self.dt * sqrt(abs(error)) * sign(error)
+        # Z
+        e7 = xd[5, 0] - x7
+        e8 = x8 - xd[5, 1] - c7 * e7
+        u1 = self.m * (self.g + e7 + xd[5, 2] - c8 * e8 + c7 * (xd[5, 1] - x8)) / (cos(x1) * cos(x3))
 
-        error = self.yaw_levante[2, 0] - self.yaw_levante[1, 0]
-        self.yaw_levante[2, 0] = self.yaw_levante[2, 0] + L1 * self.dt * sqrt(abs(error)) * sign(error) + self.dt * self.yaw_levante[3, 0]
-        self.yaw_levante[3, 0] = self.yaw_levante[3, 0] + L2 * self.dt * sqrt(abs(error)) * sign(error)
+        if u1 != 0:
+            # X
+            e9 = xd[3, 0] - x9
+            e10 = x10 - xd[3, 1] - c9 * e9
+            Ux = self.m * (e9 + xd[3, 2] - c10 * e10 + c9 * (xd[3, 1] - x10)) / u1
 
-        z5 = yaw_desired - x1
-        z6 = x6 - self.yaw_levante[1, 0] - c5 * z5
-        b3 = 1 / self.Iz; # d / Ix
-        a5 = (self.Ix - self.Iy) / self.Iz
-        U4 = (-c6 * z6 + z5 - x4 * x5 * a5 + self.yaw_levante[3, 0] + c5 * self.yaw_levante[1, 0] - c5 * x6) / b3
+            # Y
+            e11 = xd[4, 0] - x11
+            e12 = x12 - xd[4, 1] - c11 * e11
+            Uy = self.m * (e11 + xd[4, 2] - c12 * e12 + c11 * (xd[4, 1] - x12)) / u1
+        else:
+            Ux = 0
+            Uy = 0
+
+        # Roll
+        e1 = Uy - x1
+        e2 = x2 - xd[0, 1] - c1 * e1
+        u2 = (e1 - a1 * x4 * x6 + xd[0, 2] - c2 * e2 + c1 * (xd[0, 1] - x2)) / b1
+
+        # Pitch
+        e3 = Ux - x3
+        e4 = x4 - xd[1, 1] - c3 * e3
+        u3 = (e3 - a2 * x2 * x6 + xd[1, 2] - c4 * e4 + c3 * (xd[1, 1] - x4)) / b2
+
+        # Yaw
+        e5 = xd[2, 0] - x5
+        e6 = x6 - xd[2, 1] - c5 * e5
+        u4 = (e5 - a3 * x2 * x4 + xd[2, 2] - c6 * e6 + c5 * (xd[2, 1] - x6)) / b3
 
         self.u = matrix([
-            [U1],
-            [U2],
-            [U3],
-            [U4]
+            [abs(u1)],
+            [u2],
+            [u3],
+            [u4]
         ])
+        self.t += self.dt
+
+        print self.u
 
     def update_observer(self):
         x_hat_dot = self.observer_function(self.x_hat)
@@ -656,7 +642,7 @@ class Quadcopter:
         ))
 
     def getMotorInput(self):
-        scaleFactor = self.thrustGain * 65536.0 / (self.fmotmax * 4)
+        scaleFactor = self.thrustGain * 65535.0 / (self.fmotmax * 4)
         u = self.u
         u[0, 0] = u[0, 0]*scaleFactor
         u[1, 0] = (u[1, 0]/2.0)/self.d
@@ -727,9 +713,10 @@ class Quadcopter:
         pitch = asin(g)
         roll = atan2(2*(q[2, 0]*q[3, 0] + q[0, 0]*q[1, 0]), q[0, 0] * q[0, 0] - q[1, 0] * q[1, 0] - q[2, 0] * q[2, 0] + q[3, 0] * q[3, 0])
         rad2deg = 180/pi
-        euler = matrix([
-            [roll * rad2deg], [pitch * rad2deg], [yaw * rad2deg]
-        ])
-        return euler[0, 0], euler[1, 0], euler[2, 0]
+        #euler = matrix([
+        #    [roll * rad2deg], [pitch * rad2deg], [yaw * rad2deg]
+        #])
+        #return euler[0, 0], euler[1, 0], euler[2, 0]
+        return roll, pitch, yaw
 
 

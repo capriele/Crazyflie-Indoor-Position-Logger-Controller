@@ -1,14 +1,14 @@
 #
 # Author: Alberto Petrucci (petrucci.alberto@gmail.com) 2017
 #
-# __author__ = "Alberto Petrucci"
-# __copyright__ = "Copyright 2017, Alberto Petrucci"
-# __credits__ = ["Alberto Petrucci"]
-# __license__ = "MIT"
-# __version__ = "1.0.0"
-# __maintainer__ = "Alberto Petrucci"
-# __email__ = "petrucci.alberto@.com"
-# __status__ = "Production"
+#__author__ = "Alberto Petrucci"
+#__copyright__ = "Copyright 2017, Alberto Petrucci"
+#__credits__ = ["Alberto Petrucci"]
+#__license__ = "Apache"
+#__version__ = "1.0.0"
+#__maintainer__ = "Alberto Petrucci"
+#__email__ = "petrucci.alberto@gmail.com"
+#__status__ = "Production"
 
 from __future__ import division
 #import direct.directbase.DirectStart
