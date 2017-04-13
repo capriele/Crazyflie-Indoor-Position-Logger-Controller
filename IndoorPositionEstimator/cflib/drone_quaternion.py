@@ -46,7 +46,8 @@ class Quadcopter:
         self.beta3y = 5.0#5.0
         self.beta3z = 1.0#1.0
         self.beta4 = 0.2
-        self.beta = 500#3000
+        self.beta = 500
+        #self.beta = 3000
         self.thrustGain = 1
         #self.thrustGain = 1.34
         #self.thrustGain = 1.37
@@ -260,6 +261,22 @@ class Quadcopter:
             [0], [0], [0], [0], [0], [0], [0]
         ])
 
+        # Variabili per BackStepping controller
+        self.backsteppingSetPoint = matrix([
+            # Roll
+            [0, 0, 0],
+            # Pitch
+            [0, 0, 0],
+            # Yaw
+            [0, 0, 0],
+            # X
+            [0, 0, 0],
+            # Y
+            [0, 0, 0],
+            # Z
+            [0, 0, 0],
+        ])
+
     def setSetPoint(self, q0, q1, q2, q3, omegax, omegay, omegaz, px, py, pz, vx, vy, vz):
         self.setPoint = matrix([
             [q0],
@@ -276,6 +293,8 @@ class Quadcopter:
             [vy],
             [vz],
         ])
+    def setBacksteppingSetPoint(self, xd):
+        self.backsteppingSetPoint = xd
 
     def setState(self, q0, q1, q2, q3, omegax, omegay, omegaz, px, py, pz, vx, vy, vz):
         self.q = matrix([
@@ -339,116 +358,175 @@ class Quadcopter:
         self.u = self.Mat_T*f
         #self.predict(self.u)
 
-    def backstepping(self, yaw_desired):
-        roll, pitch, yaw = self.quaternion2RPY()
-        # Euler Angles
-        x5 = yaw  # yaw
-        x3 = pitch  # pitch
-        x1 = roll  # roll
+    def backstepping2(self):
+        # Current State
+        x1 = self.q[0, 0]  # wq3
+        x2 = self.q[1, 0]  # wq3
+        x3 = self.q[2, 0]  # wq3
+        x4 = self.q[3, 0]  # wq3
 
         # Angular Speeds
-        x2 = self.omega[0, 0]  # wx
-        x4 = self.omega[1, 0]  # wy
-        x6 = self.omega[2, 0]  # wz
+        x5 = self.omega[0, 0]  # wx
+        x6 = self.omega[1, 0]  # wy
+        x7 = self.omega[2, 0]  # wz
 
         # Positions
-        x9 = self.p[0, 0]   # x
-        x11 = self.p[1, 0]  # y
-        x7 = self.p[2, 0]   # z
+        x8 = self.p[0, 0]   # x
+        x9 = self.p[1, 0]  # y
+        x10 = self.p[2, 0]   # z
 
         # Speeds
-        x10 = self.v[0, 0]  # vx
+        x11 = self.v[0, 0]  # vx
         x12 = self.v[1, 0]  # vy
-        x8 = self.v[2, 0]   # vz
+        x13 = self.v[2, 0]   # vz
 
-        # Controllers Paramters
-        a1 = (self.Iy - self.Iz) / self.Ix
-        a2 = (self.Iz - self.Ix) / self.Iy
-        a3 = (self.Ix - self.Iy) / self.Iz
-        b1 = self.d / self.Ix
-        b2 = self.d / self.Iy
-        b3 = 1 / self.Iz
-
-        c1 = 15
-        c2 = 10
-        c3 = 15
-        c4 = 10
-        c5 = 10
-        c6 = 3
-        c7 = 100*0.2
-        c8 = 3*0.2
-        c9 = 5.1
-        c10 = 1.1
-        c11 = 5.1
-        c12 = 1.1
-
-        factor = 1
-        c1 *= factor
-        c2 *= factor
-        c3 *= factor
-        c4 *= factor
-        c5 *= factor
-        c6 *= factor
-        c7 *= factor
-        c8 *= factor
-        c9 *= factor
-        c10 *= factor
-        c11 *= factor
-        c12 *= factor
+        # Extract rpy from the state
+        roll, pitch, yaw = self.quaternion2RPY()
 
         # contiene il riferimento + la sua derivata 1a e 2a
-        w = 1
-        a = 1
-        xd = matrix([
-            # Roll
-            [0, 0, 0],
-            # Pitch
-            [0, 0, 0],
-            # Yaw
-            [yaw_desired, 0, 0],
-            # X
-            [self.setPoint[7, 0], 0, 0],
-            #[self.setPoint[7, 0] + a * sin(w * self.t), w * a * cos(w * self.t), - w * w * a * sin(w * self.t)],
-            # Y
-            [self.setPoint[8, 0], 0, 0],
-            #[self.setPoint[8, 0] + a * cos(w * self.t), - w * a * sin(w * self.t), - w * w * a * cos(w * self.t)],
-            # Z
-            [self.setPoint[9, 0], 0, 0],
-        ])
+        xd = self.backsteppingSetPoint
+
+        print matrix([
+            [xd[3, 0], xd[4, 0], xd[5, 0]],
+            [x8, x9, x10],
+         ])
 
         # Z
-        e7 = xd[5, 0] - x7
-        e8 = x8 - xd[5, 1] - c7 * e7
-        u1 = self.m * (self.g + e7 + xd[5, 2] - c8 * e8 + c7 * (xd[5, 1] - x8)) / (cos(x1) * cos(x3))
+        c10 = 8
+        c13 = 3
+        e10 = xd[5, 0] - x10
+        e13 = x13 - xd[5, 1] - c10 * e10
+        u1 = self.m * (self.g + e10 + xd[5, 2] - c13 * e13 + c10 * (xd[5, 1] - x13)) / (x1*x1 - x2*x2 - x3*x3 + x4*x4)
 
         if u1 != 0:
             # X
-            e9 = xd[3, 0] - x9
-            e10 = x10 - xd[3, 1] - c9 * e9
-            Ux = self.m * (e9 + xd[3, 2] - c10 * e10 + c9 * (xd[3, 1] - x10)) / u1
+            c8 = 8#8
+            c11 = 4#4
+            e8 = xd[3, 0] - x8
+            e11 = x11 - xd[3, 1] - c8 * e8
+            Ux = self.m * (e8 + xd[3, 2] - c11 * e11 + c8 * (xd[3, 1] - x11)) / (2*u1)
 
             # Y
-            e11 = xd[4, 0] - x11
-            e12 = x12 - xd[4, 1] - c11 * e11
-            Uy = self.m * (e11 + xd[4, 2] - c12 * e12 + c11 * (xd[4, 1] - x12)) / u1
+            c9 = 8#8
+            c12 = 4#4
+            e9 = xd[4, 0] - x9
+            e12 = x12 - xd[4, 1] - c9 * e9
+            Uy = self.m * (e9 + xd[4, 2] - c12 * e12 + c9 * (xd[4, 1] - x12)) / (2*u1)
         else:
             Ux = 0
             Uy = 0
 
+        '''
         # Roll
-        e1 = Uy - x1
-        e2 = x2 - xd[0, 1] - c1 * e1
-        u2 = (e1 - a1 * x4 * x6 + xd[0, 2] - c2 * e2 + c1 * (xd[0, 1] - x2)) / b1
+        cr1 = 60*1.3
+        cr2 = 40*1.3
+        er1 = Uy - roll
+        er2 = x5 - xd[0, 1] - cr1 * er1
+        u2 = self.m * self.d * self.d * (er1 + x6 * x7 + xd[0, 2] - cr2 * er2 + cr1 * (xd[0, 1] - x5))
 
         # Pitch
-        e3 = Ux - x3
-        e4 = x4 - xd[1, 1] - c3 * e3
-        u3 = (e3 - a2 * x2 * x6 + xd[1, 2] - c4 * e4 + c3 * (xd[1, 1] - x4)) / b2
+        cp1 = 60*1.3
+        cp2 = 40*1.3
+        ep1 = Ux - pitch
+        ep2 = x6 - xd[1, 1] - cp1 * ep1
+        u3 = self.m * self.d * self.d * (ep1 - x5 * x7+ xd[1, 2] - cp2 * ep2 + cp1 * (xd[1, 1] - x6))
 
         # Yaw
-        e5 = xd[2, 0] - x5
-        e6 = x6 - xd[2, 1] - c5 * e5
-        u4 = (e5 - a3 * x2 * x4 + xd[2, 2] - c6 * e6 + c5 * (xd[2, 1] - x6)) / b3
+        cy1 = 15
+        cy2 = 10
+        ey1 = xd[2, 0] - yaw
+        ey2 = x7 - xd[2, 1] - cy1 * ey1
+        u4 = 2 * self.m * self.d * self.d * (ey1 + xd[2, 2] - cy2 * ey2 + cy1 * (xd[2, 1] - x7))
+        '''
+        # Desired Quaternion
+        qd = matrix([
+            [1],
+            [-(Uy-x3*x4)/x1],
+            [(Ux-x2*x4)/x1],
+            [xd[2, 0]],
+        ])
+        qd = qd / linalg.norm(qd)
+
+        # Compute quaternion error
+        q = matrix([
+            [x1],
+            [-x2],
+            [-x3],
+            [-x4]
+        ])
+        qe = self.quaternionProduct(q, qd)
+        w = matrix([
+            [0],
+            [-x5],
+            [-x6],
+            [-x7]
+        ])
+        norm_w = linalg.norm(w)
+        if norm_w != 0:
+            w = w / norm_w
+        we = self.quaternionProduct(w, qe)
+
+        '''
+        # Roll
+        cr1 = 90#100
+        cr2 = 90#300
+        er1 = qe[1, 0]
+        er2 = x5 - we[1, 0] - cr1 * er1
+        u2 = self.m * self.d * self.d * (er1 + x6 * x7 + xd[0, 2] - cr2 * er2 + cr1 * (we[1, 0] - x5))
+
+        # Pitch
+        cp1 = 90#100
+        cp2 = 90#300
+        ep1 = qe[2, 0]
+        ep2 = x6 - we[2, 0] - cp1 * ep1
+        u3 = self.m * self.d * self.d * (ep1 - x5 * x7 + xd[1, 2] - cp2 * ep2 + cp1 * (we[2, 0] - x6))
+
+        # Yaw
+        cy1 = 60
+        cy2 = 40
+        ey1 = qe[3, 0]
+        ey2 = x7 - we[3, 0] - cy1 * ey1
+        u4 = 2 * self.m * self.d * self.d * (ey1 + xd[2, 2] - cy2 * ey2 + cy1 * (we[3, 0] - x7))
+        '''
+
+        c4 = 20
+        c44 = 10
+        e4 = qe[3, 0]
+        e44 = 0.5 * (-x3 * x5 + x2 * x6 + x1 * x7) - c4 * e4
+        xd4d = we[3, 0]
+
+        c3 = 60
+        c33 = 60
+        e3 = qe[2, 0]
+        e33 = 0.5 * (x4 * x5 + x1 * x6 - x2 * x7) - c3 * e3
+        xd3d = we[2, 0]
+
+        c2 = 60
+        c22 = 60
+        e2 = qe[1, 0]
+        e22 = 0.5 * (x1 * x5 - x4 * x6 + x3 * x7) - c2 * e2
+        xd2d = we[1, 0]
+
+        x1_2 = x1 * x1
+        x2_2 = x2 * x2
+        x3_2 = x3 * x3
+        x4_2 = x4 * x4
+        x5_2 = x5 * x5
+        x6_2 = x6 * x6
+        x7_2 = x7 * x7
+        x1_3 = x1_2 * x1
+        x2_3 = x2_2 * x2
+        x3_3 = x3_2 * x3
+        x4_3 = x4_2 * x4
+        div = x1 * (x1_2 + x2_2 + x3_2 + x4_2)
+        mult = self.s * self.d * self.m
+        u2 = 0
+        u3 = 0
+        u4 = 0
+        if div != 0:
+            u4 = (mult * (x4_3 * x6_2 - x4_3 * x5_2 + x4_3 * x7_2 + 4 * e4 * x1_2 + 4 * e4 * x4_2 - 2 * c4 * x1_3 * x7 + 4 * c4 * x1_2 * xd4d + 4 * c4 * x4_2 * xd4d - 2 * x1_3 * x5 * x6 - x1_2 * x4 * x5_2 + x1_2 * x4 * x6_2 + x2_2 * x4 * x5_2 + x1_2 * x4 * x7_2 + x2_2 * x4 * x6_2 + x3_2 * x4 * x5_2 + x2_2 * x4 * x7_2 + x3_2 * x4 * x6_2 + x3_2 * x4 * x7_2 + 4 * e2 * x1 * x3 - 4 * e3 * x1 * x2 + 4 * e2 * x2 * x4 + 4 * e3 * x3 * x4 - 4 * c44 * e44 * x1_2 - 4 * c44 * e44 * x4_2 - 4 * c22 * e22 * x1 * x3 - 4 * c22 * e22 * x2 * x4 + 4 * c33 * e33 * x1 * x2 - 4 * c33 * e33 * x3 * x4 + 4 * c2 * x1 * x3 * xd2d - 4 * c3 * x1 * x2 * xd3d + 4 * c2 * x2 * x4 * xd2d + 4 * c3 * x3 * x4 * xd3d - 2 * c2 * x1_2 * x3 * x5 + 2 * c3 * x1_2 * x2 * x6 - 2 * c2 * x1 * x3_2 * x7 - 2 * c3 * x1 * x2_2 * x7 - 2 * c4 * x1_2 * x2 * x6 + 2 * c4 * x1_2 * x3 * x5 + 2 * c2 * x2 * x4_2 * x6 - 2 * c3 * x3 * x4_2 * x5 - 2 * c4 * x1 * x4_2 * x7 - 2 * c4 * x2 * x4_2 * x6 + 2 * c4 * x3 * x4_2 * x5 + 2 * x1_2 * x2 * x5 * x7 - 2 * x1 * x4_2 * x5 * x6 + 2 * x2 * x4_2 * x5 * x7 - 2 * c2 * x1 * x2 * x4 * x5 + 2 * c3 * x1 * x2 * x4 * x5 + 2 * c2 * x1 * x3 * x4 * x6 - 2 * c3 * x1 * x3 * x4 * x6 - 2 * c2 * x2 * x3 * x4 * x7 + 2 * c3 * x2 * x3 * x4 * x7)) / div
+            u3 = (mult * (x3_3 * x5_2 + x3_3 * x6_2 + x3_3 * x7_2 + 4 * e3 * x1_2 + 4 * e3 * x3_2 - 2 * c3 * x1_3 * x6 + 4 * c3 * x1_2 * xd3d + 4 * c3 * x3_2 * xd3d - 2 * x1_3 * x5 * x7 + x1_2 * x3 * x5_2 + x1_2 * x3 * x6_2 + x2_2 * x3 * x5_2 + x1_2 * x3 * x7_2 + x2_2 * x3 * x6_2 - x3 * x4_2 * x5_2 + x2_2 * x3 * x7_2 + x3 * x4_2 * x6_2 + x3 * x4_2 * x7_2 - 4 * e2 * x1 * x4 + 4 * e2 * x2 * x3 + 4 * e4 * x1 * x2 + 4 * e4 * x3 * x4 - 4 * c33 * e33 * x1_2 - 4 * c33 * e33 * x3_2 + 4 * c22 * e22 * x1 * x4 - 4 * c22 * e22 * x2 * x3 - 4 * c44 * e44 * x1 * x2 - 4 * c44 * e44 * x3 * x4 - 4 * c2 * x1 * x4 * xd2d + 4 * c2 * x2 * x3 * xd2d + 4 * c4 * x1 * x2 * xd4d + 4 * c4 * x3 * x4 * xd4d + 2 * c2 * x1_2 * x4 * x5 - 2 * c2 * x1 * x4_2 * x6 - 2 * c3 * x1 * x3_2 * x6 + 2 * c3 * x1_2 * x2 * x7 - 2 * c3 * x1_2 * x4 * x5 - 2 * c4 * x1 * x2_2 * x6 - 2 * c2 * x2 * x3_2 * x7 - 2 * c4 * x1_2 * x2 * x7 + 2 * c3 * x2 * x3_2 * x7 - 2 * c3 * x3_2 * x4 * x5 + 2 * c4 * x3_2 * x4 * x5 - 2 * x1 * x2 * x4 * x5_2 - 2 * x1_2 * x2 * x5 * x6 - 2 * x1 * x3_2 * x5 * x7 - 2 * x1 * x4_2 * x5 * x7 - 2 * c2 * x1 * x2 * x3 * x5 + 2 * c4 * x1 * x2 * x3 * x5 + 2 * c2 * x1 * x3 * x4 * x7 + 2 * c2 * x2 * x3 * x4 * x6 - 2 * c4 * x1 * x3 * x4 * x7 - 2 * c4 * x2 * x3 * x4 * x6 - 2 * x1 * x3 * x4 * x5 * x6 + 2 * x2 * x3 * x4 * x5 * x7)) / (2 * div)
+            u2 = (mult * (x2_3 * x5_2 + x2_3 * x6_2 + x2_3 * x7_2 + 4 * e2 * x1_2 + 4 * e2 * x2_2 - 2 * c2 * x1_3 * x5 + 4 * c2 * x1_2 * xd2d + 4 * c2 * x2_2 * xd2d + 2 * x1_3 * x6 * x7 + x1_2 * x2 * x5_2 + x1_2 * x2 * x6_2 + x2 * x3_2 * x5_2 + x1_2 * x2 * x7_2 + x2 * x3_2 * x6_2 - x2 * x4_2 * x5_2 + x2 * x3_2 * x7_2 + x2 * x4_2 * x6_2 + x2 * x4_2 * x7_2 + 4 * e3 * x1 * x4 + 4 * e3 * x2 * x3 - 4 * e4 * x1 * x3 + 4 * e4 * x2 * x4 - 4 * c22 * e22 * x1_2 - 4 * c22 * e22 * x2_2 - 4 * c33 * e33 * x1 * x4 - 4 * c33 * e33 * x2 * x3 + 4 * c44 * e44 * x1 * x3 - 4 * c44 * e44 * x2 * x4 + 4 * c3 * x1 * x4 * xd3d + 4 * c3 * x2 * x3 * xd3d - 4 * c4 * x1 * x3 * xd4d + 4 * c4 * x2 * x4 * xd4d - 2 * c2 * x1 * x2_2 * x5 - 2 * c2 * x1_2 * x3 * x7 + 2 * c2 * x1_2 * x4 * x6 - 2 * c3 * x1 * x4_2 * x5 - 2 * c4 * x1 * x3_2 * x5 - 2 * c2 * x2_2 * x3 * x7 + 2 * c2 * x2_2 * x4 * x6 - 2 * c3 * x1_2 * x4 * x6 + 2 * c3 * x2_2 * x3 * x7 + 2 * c4 * x1_2 * x3 * x7 - 2 * c4 * x2_2 * x4 * x6 + 2 * x1 * x3 * x4 * x5_2 + 2 * x1_2 * x3 * x5 * x6 + 2 * x1 * x2_2 * x6 * x7 + 2 * x1 * x3_2 * x6 * x7 + 2 * x1 * x4_2 * x6 * x7 + 2 * x2_2 * x4 * x5 * x7 - 2 * c3 * x1 * x2 * x3 * x6 + 2 * c4 * x1 * x2 * x3 * x6 + 2 * c3 * x1 * x2 * x4 * x7 - 2 * c3 * x2 * x3 * x4 * x5 - 2 * c4 * x1 * x2 * x4 * x7 + 2 * c4 * x2 * x3 * x4 * x5 - 2 * x1 * x2 * x3 * x5 * x7 - 2 * x1 * x2 * x4 * x5 * x6)) / (2 * div)
 
         self.u = matrix([
             [abs(u1)],
@@ -456,9 +534,6 @@ class Quadcopter:
             [u3],
             [u4]
         ])
-        self.t += self.dt
-
-        print self.u
 
     def update_observer(self):
         x_hat_dot = self.observer_function(self.x_hat)
@@ -661,6 +736,22 @@ class Quadcopter:
         m3 = u[0, 0] + u[1, 0] - u[2, 0] + u[3, 0]
         m4 = u[0, 0] + u[1, 0] + u[2, 0] - u[3, 0]
         return m1, m2, m3, m4
+
+    def quaternionProduct(self, q, p):
+        """
+        Compute the quaternion product q*p
+        :param self:
+        :param q:
+        :param p:
+        :return:
+        """
+        Qq = matrix([
+            [q[0, 0], -q[1, 0], -q[2, 0], -q[3, 0]],
+            [q[1, 0],  q[0, 0], -q[3, 0],  q[2, 0]],
+            [q[2, 0],  q[3, 0],  q[0, 0], -q[1, 0]],
+            [q[3, 0], -q[2, 0],  q[1, 0],  q[0, 0]]
+        ])
+        return Qq*p
 
     def quaternion2RotationMatrix(self):
         """
