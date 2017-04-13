@@ -246,3 +246,8 @@ This software requires some log variables from the crazyflie; so you should simp
 If you have same trouble with this app please contact me at: [petrucci.alberto@gmail.com](mailto:petrucci.alberto@gmail.com).
 
 **Please leave the signature into the navbar or in the top of the files.**
+
+## TODO List
+- [x] Offline LQR Control
+- [x] Offline Backstepping Control
+- [ ] Online Backstepping Control (in progress)
