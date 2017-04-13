@@ -163,12 +163,12 @@ after we can send this command to the crazyflie with the `cflib`
 The NonLinear Observer was developed according: [Link](http://ing.univaq.it/manes/FilesLavoriPDF/R002_Observer_NonlinAn-TMeA_97.pdf)
 
 ## Important Variables
-If there are some problems with the control you can change control's gain in the file `drone_quaternion.py`. 
-	
-        self.thrustGain = 1.34 #gain for the conversion of force in thrust
+If there are some problems with the control you can change control's gain in the file `drone_quaternion.py`:
+
+	self.thrustGain = 1.34 #gain for the conversion of force in thrust
 
 #### LQR Gains
-These are the main gains for the LQR-controller that you can change going to the top of the `__init__(...)` function inside `drone_quaternion.py`
+These are the main gains for the LQR-controller that you can change going to the top of the `__init__(...)` function inside `drone_quaternion.py`:
 
 	self.beta1 = 0.3  #gain for quaternions dynamics
         self.beta2 = 0.3  #gain for angular speeds
@@ -179,7 +179,7 @@ These are the main gains for the LQR-controller that you can change going to the
         self.beta = 500   #gain for the inputs
 	
 #### BackStepping Gains
-These are the main gains for the BackStepping-controller that you can change going to the function `backstepping(...)` inside `drone_quaternion.py`
+These are the main gains for the BackStepping-controller that you can change going to the function `backstepping(...)` inside `drone_quaternion.py`:
 
 	# Controllers Parameters
         c1 = 6.11 #gain for roll
@@ -221,8 +221,28 @@ You can install the previous packages with these commands:
 	[sudo] pip install jinja2
 
 If you have some trouble during the slycot installation install it from source following this [link](https://github.com/python-control/Slycot)
+
+## Crazyflie firmware
+This software requires some log variables from the crazyflie; so you should simply add the following code at the end of the file `stabilizer.c` inside `/src/modules/src` directory. You can consider to edit directly the [official firmware](https://github.com/bitcraze/crazyflie-firmware)
+
+	LOG_GROUP_START(state)
+	LOG_ADD(LOG_FLOAT, q0, &state.attitudeQuaternion.w)
+	LOG_ADD(LOG_FLOAT, q1, &state.attitudeQuaternion.x)
+	LOG_ADD(LOG_FLOAT, q2, &state.attitudeQuaternion.y)
+	LOG_ADD(LOG_FLOAT, q3, &state.attitudeQuaternion.z)
+	LOG_ADD(LOG_FLOAT, wx, &sensorData.gyro.x)
+	LOG_ADD(LOG_FLOAT, wy, &sensorData.gyro.y)
+	LOG_ADD(LOG_FLOAT, wz, &sensorData.gyro.z)
+	LOG_ADD(LOG_FLOAT, px, &state.position.x)
+	LOG_ADD(LOG_FLOAT, py, &state.position.y)
+	LOG_ADD(LOG_FLOAT, pz, &state.position.z)
+	LOG_ADD(LOG_FLOAT, vx, &state.velocity.x)
+	LOG_ADD(LOG_FLOAT, vy, &state.velocity.y)
+	LOG_ADD(LOG_FLOAT, vz, &state.velocity.z)
+	LOG_GROUP_STOP(state)
+
 ## Support or Contact
 
 If you have same trouble with this app please contact me at: [petrucci.alberto@gmail.com](mailto:petrucci.alberto@gmail.com).
 
-**Please leave the signature into the navbar.**
+**Please leave the signature into the navbar or in the top of the files.**
