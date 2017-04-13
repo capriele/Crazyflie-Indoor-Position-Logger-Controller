@@ -380,9 +380,6 @@ class Quadcopter:
         x12 = self.v[1, 0]  # vy
         x13 = self.v[2, 0]   # vz
 
-        # Extract rpy from the state
-        roll, pitch, yaw = self.quaternion2RPY()
-
         # contiene il riferimento + la sua derivata 1a e 2a
         xd = self.backsteppingSetPoint
 
@@ -416,28 +413,6 @@ class Quadcopter:
             Ux = 0
             Uy = 0
 
-        '''
-        # Roll
-        cr1 = 60*1.3
-        cr2 = 40*1.3
-        er1 = Uy - roll
-        er2 = x5 - xd[0, 1] - cr1 * er1
-        u2 = self.m * self.d * self.d * (er1 + x6 * x7 + xd[0, 2] - cr2 * er2 + cr1 * (xd[0, 1] - x5))
-
-        # Pitch
-        cp1 = 60*1.3
-        cp2 = 40*1.3
-        ep1 = Ux - pitch
-        ep2 = x6 - xd[1, 1] - cp1 * ep1
-        u3 = self.m * self.d * self.d * (ep1 - x5 * x7+ xd[1, 2] - cp2 * ep2 + cp1 * (xd[1, 1] - x6))
-
-        # Yaw
-        cy1 = 15
-        cy2 = 10
-        ey1 = xd[2, 0] - yaw
-        ey2 = x7 - xd[2, 1] - cy1 * ey1
-        u4 = 2 * self.m * self.d * self.d * (ey1 + xd[2, 2] - cy2 * ey2 + cy1 * (xd[2, 1] - x7))
-        '''
         # Desired Quaternion
         qd = matrix([
             [1],
@@ -465,29 +440,6 @@ class Quadcopter:
         if norm_w != 0:
             w = w / norm_w
         we = self.quaternionProduct(w, qe)
-
-        '''
-        # Roll
-        cr1 = 90#100
-        cr2 = 90#300
-        er1 = qe[1, 0]
-        er2 = x5 - we[1, 0] - cr1 * er1
-        u2 = self.m * self.d * self.d * (er1 + x6 * x7 + xd[0, 2] - cr2 * er2 + cr1 * (we[1, 0] - x5))
-
-        # Pitch
-        cp1 = 90#100
-        cp2 = 90#300
-        ep1 = qe[2, 0]
-        ep2 = x6 - we[2, 0] - cp1 * ep1
-        u3 = self.m * self.d * self.d * (ep1 - x5 * x7 + xd[1, 2] - cp2 * ep2 + cp1 * (we[2, 0] - x6))
-
-        # Yaw
-        cy1 = 60
-        cy2 = 40
-        ey1 = qe[3, 0]
-        ey2 = x7 - we[3, 0] - cy1 * ey1
-        u4 = 2 * self.m * self.d * self.d * (ey1 + xd[2, 2] - cy2 * ey2 + cy1 * (we[3, 0] - x7))
-        '''
 
         c4 = 20
         c44 = 10
