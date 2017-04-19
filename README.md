@@ -250,4 +250,4 @@ If you have same trouble with this app please contact me at: [petrucci.alberto@g
 ## TODO List
 - [x] Offline LQR Control
 - [x] Offline Backstepping Control
-- [ ] Online Backstepping Control (in progress)
+- [x] Online Backstepping Control (in progress)
