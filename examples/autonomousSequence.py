@@ -42,6 +42,9 @@ logging.basicConfig(level=logging.ERROR)
 # Keypress
 import pygame, sys, time
 from pygame.locals import *
+SCREEN_WIDTH = 400
+SCREEN_HEIGHT = 310
+FONT_SIZE = 30
 
 from numpy import *
 from math import *
@@ -52,6 +55,7 @@ crazyflie = False
 positionIndex = 0
 
 ONLINE_CONTROLLER = True
+MANUAL_TRAJECTORY = False
 
 # Variabili atterraggio
 land = False
@@ -61,7 +65,7 @@ land_altitude_step = 0.1  # 10cm
 uri = 'radio://0/120/2M'
 # uri = 'radio://0/40/250K'
 
-x = 1.2
+x = 1.5
 y = 1.4
 z = 1.6
 #            x  y   z  YAW
@@ -72,6 +76,9 @@ sequence = [(x, y, z, 0),
             (x, y, z, 0),
             (x, y, 0.5, 0)
             ]
+# Manual Trajectory
+trajectoryStep = 0.10  # 10cm
+manual = {'x': x, 'y': y, 'z': z}
 
 positionLogger = False
 quadcopter = Quadcopter(0.01)
@@ -107,6 +114,18 @@ def emergency_stop(cf):
         # cf.param.set_value('flightmode.poshold', '1')
         return True
     return False
+
+
+def text_to_screen(screen, text, x, y, size=50, color=(200, 000, 000)):
+    try:
+        basicfont = pygame.font.SysFont(None, size)
+        text = basicfont.render(text, True, color, (255, 255, 255))
+        text_rect = text.get_rect(center=(SCREEN_WIDTH / 2, y+10))
+        screen.blit(text, text_rect)
+        pygame.display.update()
+    except Exception, e:
+        print 'Font Error, saw it coming'
+        raise e
 
 
 class LoggingExample:
@@ -212,15 +231,21 @@ class LoggingExample:
         #self.log_config3.add_variable('state.vx', 'float')
         #self.log_config3.add_variable('state.vy', 'float')
         #self.log_config3.add_variable('state.vz', 'float')
-        self.log_config3.add_variable('ctrltarget.px', 'float')
-        self.log_config3.add_variable('ctrltarget.py', 'float')
-        self.log_config3.add_variable('ctrltarget.pz', 'float')
-        self.log_config3.add_variable('ctrltarget.vx', 'float')
-        self.log_config3.add_variable('ctrltarget.vy', 'float')
-        self.log_config3.add_variable('ctrltarget.vz', 'float')
+        #self.log_config3.add_variable('ctrltarget.px', 'float')
+        #self.log_config3.add_variable('ctrltarget.py', 'float')
+        #self.log_config3.add_variable('ctrltarget.pz', 'float')
+        #self.log_config3.add_variable('ctrltarget.vx', 'float')
+        #self.log_config3.add_variable('ctrltarget.vy', 'float')
+        #self.log_config3.add_variable('ctrltarget.vz', 'float')
         #self.log_config3.add_variable('ctrltarget.ax', 'float')
         #self.log_config3.add_variable('ctrltarget.ay', 'float')
         #self.log_config3.add_variable('ctrltarget.az', 'float')
+        self.log_config3.add_variable('Bks.dx', 'float')
+        self.log_config3.add_variable('Bks.dy', 'float')
+        self.log_config3.add_variable('Bks.dz', 'float')
+        self.log_config3.add_variable('Bks.dwx', 'float')
+        self.log_config3.add_variable('Bks.dwy', 'float')
+        self.log_config3.add_variable('Bks.dwz', 'float')
 
         # Adding the configuration cannot be done until a Crazyflie is
         # connected, since we need to check that the variables we
@@ -244,7 +269,7 @@ class LoggingExample:
             if not ONLINE_CONTROLLER:
                 self.log_config1.start()
                 self.log_config2.start()
-                self.log_config3.start()
+            self.log_config3.start()
             print "Log succesfully started!"
             self.status = True
         except KeyError as e:
@@ -279,6 +304,7 @@ class LoggingExample:
         #self.vy = data['state.vy']
         #self.vz = data['state.vz']
         self.data = data
+        print data
 
     def _connection_failed(self, link_uri, msg):
         """Callback when connection initial connection fails (i.e no Crazyflie
@@ -402,8 +428,8 @@ def set_point():
                 zd = position[2]
                 zdd = 0
 
-            w = 3#4
-            a = 0.8#0.4
+            w = 3#3#4
+            a = 0.4#0.4
             xd = matrix([
                 # Roll
                 [0, 0, 0],
@@ -413,15 +439,15 @@ def set_point():
                 [0, 0, 0],
                 # X
                 # [self.setPoint[7, 0], 0, 0],
-                # [position[0] + a * sin(w * t), w * a * cos(w * t), - w * w * a * sin(w * t)],  # circle
-                [position[0] + a * sin(w * t), w * a * cos(w * t), - w * w * a * sin(w * t)],  # infty
+                [position[0] + a * sin(w * t), w * a * cos(w * t), - w * w * a * sin(w * t)],  # circle
+                #[position[0] + a * sin(w * t), w * a * cos(w * t), - w * w * a * sin(w * t)],  # infty
                 # [X, Xd, Xdd],  # triangle
 
 
                 # Y
                 # [self.setPoint[8, 0], 0, 0],
-                # [position[1] + a * cos(w * t) - a, - w * a * sin(w * t), - w * w * a * cos(w * t)],  # circle
-                [position[1] + a * sin(w/2 * t), w/2 * a * cos(w/2 * t), - w/2 * w/2 * a * sin(w/2 * t)],  # infty
+                [position[1] + a * cos(w * t) - a, - w * a * sin(w * t), - w * w * a * cos(w * t)],  # circle
+                #[position[1] + a * sin(w/2 * t), w/2 * a * cos(w/2 * t), - w/2 * w/2 * a * sin(w/2 * t)],  # infty
                 # [Y, Yd, Ydd],  # triangle
 
                 # Z
@@ -435,12 +461,6 @@ def set_point():
                 crazyflie.commander.send_backstepping_control_references(1, xd[3, 0], xd[4, 0], xd[5, 0],
                                                                          xd[3, 1], xd[4, 1], xd[5, 1],
                                                                          xd[3, 2], xd[4, 2], xd[5, 2])
-                #xc = logger.getData()
-                #p = matrix([
-                #    [xd[3, 0], xd[4, 0], xd[5, 0], xd[3, 1], xd[4, 1], xd[5, 1]],
-                #    [xc['ctrltarget.px'], xc['ctrltarget.py'], xc['ctrltarget.pz'], xc['ctrltarget.vx'], xc['ctrltarget.vy'], xc['ctrltarget.vz']],
-                #])
-                #print p
             else:
                 quadcopter.setBacksteppingSetPoint(xd)
             t += 0.03
@@ -450,7 +470,7 @@ def set_point():
             crazyflie.commander.send_stop_setpoint()
     else:
         # rimango nella posizione attuale ed piano piano diminuisco la z
-        position = sequence[positionIndex]
+        position = sequence[0]
         xd = matrix([
             # Roll
             [0, 0, 0],
@@ -555,45 +575,24 @@ if __name__ == '__main__':
         continue
     crazyflie = logger.crazyflie()
     if ONLINE_CONTROLLER:
-        '''
-        crazyflie.param.set_value('ctrlr.tau_xy', '0.2')
-        crazyflie.param.set_value('ctrlr.zeta_xy', '0.8')
-        crazyflie.param.set_value('ctrlr.tau_z', '0.2')
-        crazyflie.param.set_value('ctrlr.zeta_z', '0.8')
-        crazyflie.param.set_value('ctrlr.tau_rp', '0.2')
-        '''
-
         crazyflie.param.set_value('flightmode.posSet', '1')
-        '''
-        # x-gains
-        crazyflie.param.set_value('posCtlBks.kx1', '10')
-        crazyflie.param.set_value('posCtlBks.kx2', '6')
-
-        # y-gains
-        crazyflie.param.set_value('posCtlBks.ky1', '10')
-        crazyflie.param.set_value('posCtlBks.ky2', '6')
-
-        # z-gains
-        crazyflie.param.set_value('posCtlBks.kz1', '8')
-        crazyflie.param.set_value('posCtlBks.kz2', '3')
-
-        # roll-gains
-        crazyflie.param.set_value('posCtlBks.kr1', '40')
-        crazyflie.param.set_value('posCtlBks.kr2', '40')
-
-        # pitch-gains
-        crazyflie.param.set_value('posCtlBks.kp1', '40')
-        crazyflie.param.set_value('posCtlBks.kp2', '40')
-
-        # yaw-gains
-        crazyflie.param.set_value('posCtlBks.kw1', '20')
-        crazyflie.param.set_value('posCtlBks.kw2', '10')
-        '''
         # disturbace estimation gains
-        crazyflie.param.set_value('posCtlBks.alpha', '0.9999')
-        crazyflie.param.set_value('posCtlBks.alphaw', '0.999')
-        crazyflie.param.set_value('posCtlBks.L1', '10')
-        crazyflie.param.set_value('posCtlBks.L2', '20')
+        #LEVANTE
+        #crazyflie.param.set_value('posCtlBks.alpha', '0.9999')
+        #crazyflie.param.set_value('posCtlBks.alphaw', '0.999')
+        #crazyflie.param.set_value('posCtlBks.L1', '10')
+        #crazyflie.param.set_value('posCtlBks.L2', '20')
+
+        #OBSERVER
+        #crazyflie.param.set_value('posCtlBks.alpha', '0.00001')
+        #crazyflie.param.set_value('posCtlBks.L1', '100')
+        #crazyflie.param.set_value('posCtlBks.L2', '20000')
+        ##crazyflie.param.set_value('posCtlBks.alpha', '0.001')
+        ##crazyflie.param.set_value('posCtlBks.L1', '1')
+        ##crazyflie.param.set_value('posCtlBks.L2', '1000')
+        crazyflie.param.set_value('posCtlBks.alpha', '0.1')
+        crazyflie.param.set_value('posCtlBks.L1', '0.1')
+        crazyflie.param.set_value('posCtlBks.L2', '0.1')
 
         # x-gains
         crazyflie.param.set_value('posCtlBks.kx1', '2')
@@ -622,13 +621,27 @@ if __name__ == '__main__':
         crazyflie.param.set_value('posCtlBks.errorLimit', '100000')
 
     pygame.init()
+    pygame.font.init()
     pygame.joystick.init()
     #joystick = pygame.joystick.Joystick(0)
     #joystick.init()
-    screen = pygame.display.set_mode((400, 300))
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    screen.fill((255, 255, 255))
     pygame.display.set_caption('Hello World')
     #numaxes = joystick.get_numaxes()
     loopQuit = False
+
+    #Print commands on the screen
+    text_to_screen(screen, 'Manual Mode Commands', 10, 10, FONT_SIZE, (200, 0, 0))
+    text_to_screen(screen, 'Arrow Up: X +', 10, 10+FONT_SIZE, FONT_SIZE, (200, 0, 0))
+    text_to_screen(screen, 'Arrow Down: X -', 10, 10+2*FONT_SIZE, FONT_SIZE, (200, 0, 0))
+    text_to_screen(screen, 'Arrow Left: Y +', 10, 10+3*FONT_SIZE, FONT_SIZE, (200, 0, 0))
+    text_to_screen(screen, 'Arrow Right: Y -', 10, 10+4*FONT_SIZE, FONT_SIZE, (200, 0, 0))
+    text_to_screen(screen, '[U]p: Z +', 10, 10+5*FONT_SIZE, FONT_SIZE, (200, 0, 0))
+    text_to_screen(screen, '[D]own: Z -', 10, 10+6*FONT_SIZE, FONT_SIZE, (200, 0, 0))
+    text_to_screen(screen, '[L]: Landing', 10, 10+7*FONT_SIZE, FONT_SIZE, (200, 0, 0))
+    text_to_screen(screen, '[ESC]: Emergency Stop', 10, 10+8*FONT_SIZE, FONT_SIZE, (200, 0, 0))
+    text_to_screen(screen, '[ENTER]: Start', 10, 10+9*FONT_SIZE, FONT_SIZE, (200, 0, 0))
 
     # The Crazyflie lib doesn't contain anything to keep the application alive,
     # so this is where your application should do something. In our case we
@@ -649,7 +662,8 @@ if __name__ == '__main__':
         control(0.01, loop)
 
     # cambio il set_point ogni tot. secondi
-    control(0.01*3, set_point)
+    if not MANUAL_TRAJECTORY:
+        control(0.01*3, set_point)
 
     # Posizioni iniziali
     deltaP = 0.005
@@ -657,6 +671,8 @@ if __name__ == '__main__':
     positionY = sequence[0][1]
     positionZ = sequence[0][2]
     quadcopter.setSetPoint(1, 0, 0, 0, 0, 0, 0, positionX, positionY, positionZ, 0, 0, 0)
+
+    buttonPressed = False
     while not loopQuit:
         # Leggo il JoyStick
         #axisX = -round(joystick.get_axis(1), 1)  # get the analog value of the specified axis
@@ -691,8 +707,37 @@ if __name__ == '__main__':
             land_altitude = positionZ
             logger.enable_landing()
             land = True
-
-        if keys[K_ESCAPE]:
+        elif keys[K_UP]:
+            # increase X
+            if not buttonPressed:
+                manual['x'] = manual['x'] + trajectoryStep
+            #buttonPressed = True
+        elif keys[K_DOWN]:
+            # decrease X
+            if not buttonPressed:
+                manual['x'] = manual['x'] - trajectoryStep
+            #buttonPressed = True
+        elif keys[K_LEFT]:
+            # increase Y
+            if not buttonPressed:
+                manual['y'] = manual['y'] + trajectoryStep
+            #buttonPressed = True
+        elif keys[K_RIGHT]:
+            # decrease Y
+            if not buttonPressed:
+                manual['y'] = manual['y'] - trajectoryStep
+            #buttonPressed = True
+        elif keys[K_u]:
+            # increase Z
+            if not buttonPressed:
+                manual['z'] = manual['z'] + trajectoryStep
+            #buttonPressed = True
+        elif keys[K_d]:
+            # decrease Z
+            if not buttonPressed:
+                manual['z'] = manual['z'] - trajectoryStep
+            #buttonPressed = True
+        elif keys[K_ESCAPE]:
             print 'Emergency Stop!'
             stop = True
             loopQuit = True
@@ -704,12 +749,28 @@ if __name__ == '__main__':
             crazyflie.commander.send_stop_setpoint()
             #crazyflie.commander.send_control_emergency_stop()
             logger.close_link()
+        else:
+            buttonPressed = False
+
+        if MANUAL_TRAJECTORY and not stop:
+            print manual
+            v = 0
+            a = 0
+            z = manual['z']
+            if z > t:
+                z = t
+            crazyflie.commander.send_backstepping_control_references(1, manual['x'], manual['y'], z, v, v, v, a, a, a)
 
         # Gestisco tutti gli eventi di PyGame
         for event in pygame.event.get():
             if event.type == QUIT:
                 loopQuit = True
-        time.sleep(0.1)
+
+        if MANUAL_TRAJECTORY:
+            time.sleep(0.03)
+            t += 0.03
+        else:
+            time.sleep(0.1)
     pygame.quit()
     sys.exit()
 
