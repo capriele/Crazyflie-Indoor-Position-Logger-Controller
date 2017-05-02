@@ -1,0 +1,3 @@
+[submodule "crazyflie-firmware"]
+	path = crazyflie-firmware
+	url = git://github.com/capriele/crazyflie-firmware.git
